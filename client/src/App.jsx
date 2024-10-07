@@ -6,7 +6,7 @@ const Login = lazy(() => import("./pages/Login.jsx"));
 const Chat = lazy(() => import("./pages/Chat.jsx"));
 const Group = lazy(() => import("./pages/Group.jsx"));
 const NotFound=lazy(()=> import("./pages/NotFound.jsx"))
-let user = false;
+let user = true;
 function App() {
   return (
     <>
