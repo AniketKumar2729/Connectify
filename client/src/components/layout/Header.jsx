@@ -12,21 +12,30 @@ import AddIcon from "@mui/icons-material/Add";
 import LogoutIcon from '@mui/icons-material/Logout';
 import Diversity3Icon from "@mui/icons-material/Diversity3";
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import { orange } from "@mui/material/colors";
+import { blue } from "../../constants/color.js";
 
-import React from "react";
+import React, { lazy, Suspense, useState } from "react";
 import { useNavigate } from "react-router-dom";
+
+let Search =lazy(()=>import("../specific/Search.jsx"));
+let Notification=lazy(()=>import("../specific/Notification.jsx"))
+let NewGroup=lazy(()=>import("../specific/NewGroup.jsx"))
 
 const Header = () => {
   const navigate = useNavigate();
+  let [mobile,setMobile]=useState(false);
+  let [search,setSearch]=useState(false);
+  let [group,setGroup]=useState(false);
+  let [notification,setNotification]=useState(false);
   const handleMobile = () => {
     console.log("Mobile");
+    
   };
   const openSearchDialog = () => {
-    console.log("Search");
+   setSearch(prev=>!prev)
   };
   const openNewGroup = () => {
-    console.log("Group");
+    setGroup(prev=>!prev)
   };
   const navigateToGroup = () => {
     navigate("/group");
@@ -36,14 +45,15 @@ const Header = () => {
    
   };
   const openNotification = () => {
-   console.log("Notification");
+   setNotification(prev=>!prev)
    
   };
   return (
     <>
       <Box sx={{ flexGrow: 1 }} height={"4rem"}>
-        <AppBar position="static" sx={{ bgcolor: orange }}>
+        <AppBar position="static" sx={{ bgcolor:blue}}>
           <Toolbar>
+          {/* rightpart of header */}
             <Typography
               variant="h6"
               sx={{ display: { xs: "none", sm: "block" } }}
@@ -55,7 +65,9 @@ const Header = () => {
                 <MenuIcon />
               </IconButton>
             </Box>
+            {/* middlebox for taking all space so that leftpart of header can go to left */}
             <Box sx={{ flexGrow: 1 }} />
+            {/* leftpart of header */}
             <Box>
               <IconBtn
                 title={"Search"}
@@ -94,6 +106,15 @@ const Header = () => {
           </Toolbar>
         </AppBar>
       </Box>
+      {
+        search&&(<Suspense fallback={<div>Loading...</div>}><Search/></Suspense>)
+      }
+      {
+        group&&(<Suspense fallback={<div>Loading...</div>}><NewGroup/></Suspense>)
+      }
+      {
+        notification&&(<Suspense fallback={<div>Loading...</div>}><Notification/></Suspense>)
+      }
     </>
   );
 };
