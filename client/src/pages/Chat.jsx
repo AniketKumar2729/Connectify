@@ -5,6 +5,7 @@ import React, { useRef } from 'react';
 import AppLayout from '../components/layout/AppLayout';
 import { InputBox } from '../components/styles/StyledComponent';
 import { gray } from '../constants/color';
+import FileMenu from '../components/dialogs/FileMenu';
 
 function Chat() {
   const containerRef=useRef(null)
@@ -25,6 +26,7 @@ function Chat() {
         </IconButton>
       </Stack>
     </form>
+    <FileMenu/>
     </>
   )
 }
