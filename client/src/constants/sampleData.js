@@ -60,3 +60,38 @@ export const sampleNotificaiton = [
         }
     }
 ]
+
+export const sampleMessage = [
+    {
+        attachments: [
+            {
+                public_id: "abcdef",
+                url: "https://letsenhance.io/static/8f5e523ee6b2479e26ecc91b9c25261e/1015f/MainAfter.jpg"
+            },
+        ],
+        content:"Lado ka msg hai",
+        _id:'alkjsdklasjdjasdlk',
+        sender:{
+            _id:"user01",
+            name:"User-1"
+        },
+        chat:'chatId',
+        createdAt:'2024-10-10'
+    },
+    {
+        attachments: [
+            {
+                public_id: "ijkl",
+                url: "https://letsenhance.io/static/8f5e523ee6b2479e26ecc91b9c25261e/1015f/MainAfter.jpg"
+            },
+        ],
+        content:"Golu ka msg hai",
+        _id:'alkjsdklasjdjasdlk',
+        sender:{
+            _id:"akdlkas",
+            name:"User-2"
+        },
+        chat:'chatId',
+        createdAt:'2024-10-09'
+    }
+]

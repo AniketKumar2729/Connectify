@@ -6,7 +6,13 @@ import AppLayout from '../components/layout/AppLayout';
 import { InputBox } from '../components/styles/StyledComponent';
 import { gray } from '../constants/color';
 import FileMenu from '../components/dialogs/FileMenu';
+import { sampleMessage } from '../constants/sampleData';
+import MessageComponent from '../components/shared/MessageComponent';
 
+const sampleUser={
+  _id:"akdlkas",
+  name:"Hey"
+}
 function Chat() {
   const containerRef=useRef(null)
   return (
@@ -14,6 +20,9 @@ function Chat() {
 
     <Stack ref={containerRef} boxSizing={'border-box'} padding={'1rem'} spacing={'1rem'} bgcolor={gray} height={'90%'} sx={{overflowY:'auto',overflowX:'hidden'}}>
     {/* messages  render */}
+    {
+      sampleMessage.map(i=>(<MessageComponent message={i} user={sampleUser}/>))
+    }
     </Stack>
     <form style={{height:"10%"}}>
       <Stack direction={'row'} height={'100%'} padding={'1rem'} alignItems={'center'} position={'relative'}>
