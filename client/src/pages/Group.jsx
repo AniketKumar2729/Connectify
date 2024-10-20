@@ -1,5 +1,5 @@
-import React, { memo, useEffect, useState } from 'react';
-import { Box, Button, Drawer, Grid, IconButton, Stack, TextField, Tooltip, Typography } from '@mui/material';  // Standard Grid from MUI
+import React, { lazy, memo, Suspense, useEffect, useState } from 'react';
+import { Backdrop, Box, Button, Drawer, Grid, IconButton, Stack, TextField, Tooltip, Typography } from '@mui/material';  // Standard Grid from MUI
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import MenuIcon from '@mui/icons-material/Menu';
 import EditIcon from '@mui/icons-material/Edit';
@@ -10,15 +10,20 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Link } from '../components/styles/StyledComponent';
 import AvatarCard from '../components/shared/AvatarCard';
 import { sampleChats } from '../constants/sampleData';
+//lazzy load
+const DeleteDialog=lazy(()=>import("../components/dialogs/DeleteDialog.jsx"))
+const AddMemberDialog=lazy(()=>import("../components/dialogs/AddMemberDialog.jsx"))
+//lazzy load
 const Group = () => {
   const groupId = useSearchParams()[0].get('group')
   console.log(groupId);
-
   const navigate = useNavigate()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [groupName, setGroupName] = useState("");
   const [updatedgroupName, setUpdatedGroupName] = useState("");
+  const [confirmDeleteDialog,setConfirmDeleteDialog]=useState(false)
+  const isAddMember=true;
   const hanldeMobile = () => {
     setIsMobileMenuOpen(prev => !prev)
   }
@@ -30,6 +35,11 @@ const Group = () => {
   }
   const deleteHandler=()=>{
     setConfirmDeleteDialog(true);
+  }
+  const dltHandler=()=>{
+    console.log('delete handler for delete dialog box');
+    closeDialog();
+    
   }
   const closeDialog=()=>{
     setConfirmDeleteDialog(false)
@@ -126,7 +136,14 @@ const Group = () => {
           </>
         }
       </Grid>
-      
+      {
+        isAddMember && <Suspense fallback={<Backdrop open/>}>
+          <AddMemberDialog/>
+        </Suspense>
+      }
+      {
+        confirmDeleteDialog&&<Suspense fallback={<Backdrop open/>}><DeleteDialog open={confirmDeleteDialog} handleClose={closeDialog} deleteHandler={dltHandler}/></Suspense>
+      }
       <Drawer open={isMobileMenuOpen} onClose={hanldeMobileClose} sx={{ display: { xs: 'block', sm: 'none' } }} >
         <GroupList w={'50vw'} myGroups={sampleChats} groupId={groupId} />
       </Drawer>
