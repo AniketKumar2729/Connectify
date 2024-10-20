@@ -66,7 +66,7 @@ export const sampleMessage = [
         attachments: [
             {
                 public_id: "abcdef",
-                url: "https://letsenhance.io/static/8f5e523ee6b2479e26ecc91b9c25261e/1015f/MainAfter.jpg"
+                url:"https://images.pexels.com/photos/733853/pexels-photo-733853.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500"
             },
         ],
         content:"Lado ka msg hai",
@@ -86,7 +86,7 @@ export const sampleMessage = [
             },
         ],
         content:"Golu ka msg hai",
-        _id:'alkjsdklasjdjasdlk',
+        _id:'alkjsdklasjsdasadjasdlk',
         sender:{
             _id:"akdlkas",
             name:"User-2"

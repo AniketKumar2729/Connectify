@@ -21,7 +21,7 @@ function Chat() {
     <Stack ref={containerRef} boxSizing={'border-box'} padding={'1rem'} spacing={'1rem'} bgcolor={gray} height={'90%'} sx={{overflowY:'auto',overflowX:'hidden'}}>
     {/* messages  render */}
     {
-      sampleMessage.map(i=>(<MessageComponent message={i} user={sampleUser}/>))
+      sampleMessage.map(i=>(<MessageComponent  key={i._id} message={i} user={sampleUser}/>))
     }
     </Stack>
     <form style={{height:"10%"}}>
