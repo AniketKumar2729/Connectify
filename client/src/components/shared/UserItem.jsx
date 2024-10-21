@@ -3,11 +3,11 @@ import React, { memo } from "react";
 import AddCircleOutlineRoundedIcon from "@mui/icons-material/AddCircleOutlineRounded";
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 
-const UserItem = ({ user, handler, handlerIsLoading, isAdded = false }) => {
+const UserItem = ({ user, handler, handlerIsLoading, isAdded = false,styling={}}) => {
     const { name, _id, avatar } = user;
     return (
         <ListItem  >
-            <Stack direction={"row"} alignItems={"center"} spacing={"1rem"} width={"100%"} >
+            <Stack direction={"row"} alignItems={"center"} spacing={"1rem"} width={"100%"} {...styling} >
                 <Avatar src={avatar[0]} />
                 <Typography
                     variant="body1"

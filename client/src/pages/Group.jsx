@@ -9,21 +9,21 @@ import AddIcon from '@mui/icons-material/Add';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Link } from '../components/styles/StyledComponent';
 import AvatarCard from '../components/shared/AvatarCard';
-import { sampleChats } from '../constants/sampleData';
+import { sampleChats, sampleUser } from '../constants/sampleData';
+import UserItem from '../components/shared/UserItem.jsx';
 //lazzy load
-const DeleteDialog=lazy(()=>import("../components/dialogs/DeleteDialog.jsx"))
-const AddMemberDialog=lazy(()=>import("../components/dialogs/AddMemberDialog.jsx"))
+const DeleteDialog = lazy(() => import("../components/dialogs/DeleteDialog.jsx"))
+const AddMemberDialog = lazy(() => import("../components/dialogs/AddMemberDialog.jsx"))
 //lazzy load
 const Group = () => {
   const groupId = useSearchParams()[0].get('group')
-  console.log(groupId);
   const navigate = useNavigate()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [groupName, setGroupName] = useState("");
   const [updatedgroupName, setUpdatedGroupName] = useState("");
-  const [confirmDeleteDialog,setConfirmDeleteDialog]=useState(false)
-  const isAddMember=true;
+  const [confirmDeleteDialog, setConfirmDeleteDialog] = useState(false)
+  const isAddMember = false;
   const hanldeMobile = () => {
     setIsMobileMenuOpen(prev => !prev)
   }
@@ -33,21 +33,34 @@ const Group = () => {
   const updateGroupNameHandler = () => {
     setIsEdit(false)
   }
-  const deleteHandler=()=>{
+  const deleteHandler = () => {
     setConfirmDeleteDialog(true);
   }
-  const dltHandler=()=>{
+  const dltHandler = () => {
     console.log('delete handler for delete dialog box');
     closeDialog();
-    
+
   }
-  const closeDialog=()=>{
+  const closeDialog = () => {
     setConfirmDeleteDialog(false)
   }
-  const openAddHandler=()=>{}
+
+  const removeMemberHandler=(id)=>{
+    console.log('remove member'+id);
+    
+  }
+  const openAddHandler = () => { }
   useEffect(() => {
-    setGroupName("Group Name")
-    setUpdatedGroupName("groupname");
+    if(groupId){
+      setGroupName(`Group Name ${groupId}`)
+      setUpdatedGroupName(`groupname ${groupId}`);
+    }
+    //clean up function
+    return()=>{
+      setGroupName('')
+      setUpdatedGroupName('')
+      setIsEdit(false)
+    }
   }, [])
   const IconsBtns = <>
     <Box sx={{
@@ -86,10 +99,10 @@ const Group = () => {
       }
     </Stack>
   )
-  const ButtonGroup=(
-    <Stack direction={{sm:'row',xs:'column-reverse'}} p={{xs:'0',sm:'1rem',md:'1rem 3rem'}} spacing={'1rem'}>
-    <Button size='large' variant='contained' endIcon={<AddIcon/>} onClick={openAddHandler} >Add Members</Button>
-    <Button size='large' color='error' variant='outlined' endIcon={<DeleteIcon/>} onClick={deleteHandler}> Delete Group</Button>
+  const ButtonGroup = (
+    <Stack direction={{ sm: 'row', xs: 'column-reverse' }} p={{ xs: '0', sm: '1rem', md: '1rem 3rem' }} spacing={'1rem'}>
+      <Button size='large' variant='contained' endIcon={<AddIcon />} onClick={openAddHandler} >Add Members</Button>
+      <Button size='large' color='error' variant='outlined' endIcon={<DeleteIcon />} onClick={deleteHandler}> Delete Group</Button>
     </Stack>
   )
   return (
@@ -107,7 +120,6 @@ const Group = () => {
             xs: 'none',  // Hide on extra-small and small screens
             sm: 'block'  // Show on medium and larger screens
           },
-          backgroundColor: "#424242"
         }}
       >
         <GroupList myGroups={sampleChats} groupId={groupId} />
@@ -129,20 +141,25 @@ const Group = () => {
           groupName && <>
             {GroupNames}
             <Typography margin={'2rem'} alignSelf={'flex-start'} variant='body1'>Members</Typography>
-            <Stack maxWidth={'45rem'} width={'100%'} boxSizing={'border-box'} padding={{ sm: '1rem', xs: '0', md: '1rem 4rem' }} spacing={'2rem'} bgcolor={'#48CFCB'} height={'50vh'} overflow={'auto'}>
+            <Stack maxWidth={'45rem'} width={'100%'} boxSizing={'border-box'} padding={{ sm: '1rem', xs: '0', md: '1rem 4rem' }} spacing={'2rem'} height={'50vh'} overflow={'auto'}>
+              {/** members*/}
+              {
+                sampleUser.map((i) => (
+                  <UserItem user={i} key={i._id} isAdded styling={{boxShadow:'0 0 0.5rem rgba(0,0,0,0.2)',padding:'1rem',borderRadius:'2rem'}}  handler={removeMemberHandler}/>
+                ))
+              }
             </Stack>
-            {/** members*/}
             {ButtonGroup}
           </>
         }
       </Grid>
       {
-        isAddMember && <Suspense fallback={<Backdrop open/>}>
-          <AddMemberDialog/>
+        isAddMember && <Suspense fallback={<Backdrop open />}>
+          <AddMemberDialog />
         </Suspense>
       }
       {
-        confirmDeleteDialog&&<Suspense fallback={<Backdrop open/>}><DeleteDialog open={confirmDeleteDialog} handleClose={closeDialog} deleteHandler={dltHandler}/></Suspense>
+        confirmDeleteDialog && <Suspense fallback={<Backdrop open />}><DeleteDialog open={confirmDeleteDialog} handleClose={closeDialog} deleteHandler={dltHandler} /></Suspense>
       }
       <Drawer open={isMobileMenuOpen} onClose={hanldeMobileClose} sx={{ display: { xs: 'block', sm: 'none' } }} >
         <GroupList w={'50vw'} myGroups={sampleChats} groupId={groupId} />
@@ -152,7 +169,7 @@ const Group = () => {
 }
 const GroupList = ({ w = '100%', myGroups = [], chatId }) => {
   return <>
-    <Stack width={w} >
+    <Stack width={w} bgcolor={"#424242"}  height={"100vh"} overflow={'auto'}>
       {
         myGroups.length > 0 ? myGroups.map((group) => <GroupListItem group={group} groupId={chatId} key={group._id} />) : <Typography textAlign='center' padding='1rem'>No Groups</Typography>
       }
@@ -163,7 +180,7 @@ const GroupListItem = memo(({ group, groupId }) => {
   const { name, avatar, _id } = group
   return <Link to={`?group=${_id}`} onClick={(e) => {
     if (groupId === _id) e.preventDefault()
-  }}>
+  }} style={{margin:"1.5rem"}}>
     <Stack direction={'row'} spacing={'1rem'} alignItems={'center'}>
       <AvatarCard avatar={avatar} />
       <Typography>{name}</Typography>
