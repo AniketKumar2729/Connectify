@@ -13,7 +13,7 @@ import { DoughnutChart, LineChart } from '../../components/specific/Charts';
 
 
 const Dashboard = () => {
-  const Appbar = <Paper elevation={10} sx={{ borderRadius: '1rem', padding: '2rem', margin: '1rem 0'}}>
+  const Appbar = <Paper elevation={10} sx={{ borderRadius: '1rem', padding: '2rem', margin: '1rem 0' }}>
     <Stack direction={'row'} spacing={'1rem'} alignItems={'center'}>
       <AdminPanelSettingsIcon sx={{ fontSize: '3rem' }} />
       <SearchField />
@@ -35,26 +35,25 @@ const Dashboard = () => {
         {
           Appbar
         }
-        <Stack direction={'row'} spacing={'2rem'} flexWrap={'wrap'}>
+        <Stack direction={{ xs: 'column', lg: 'row' }} spacing={'2rem'} justifyContent={'center'} alignItems={{xs:'center',lg:'stretch'}}>
           <Paper elevation={5} sx={{ padding: '2rem 3rem', borderRadius: '1rem', maxWidth: '45rem', width: '100%', height: '25rem' }}>
-            <Typography variant='h5' margin={'1rem 2rem'}>last Message</Typography>
-            <LineChart value={[23,55,11,66]}/>
+            <Typography variant='h5' margin={'1rem 2rem'}>Last Message</Typography>
+            <LineChart value={[23, 55, 11, 66]} />
           </Paper>
-          <Paper 
-          elevation={3}
-          sx={{
-            padding: '1rem',
-            borderRadius: '2rem',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            width: { xs: '100%', sm: '50%' },
-            position: 'relative',
-            width: '100%',
-            maxWidth: '25rem',
-            height: '25rem'
-          }}>
-            <DoughnutChart/>
+          <Paper
+            elevation={3}
+            sx={{
+              padding: '1rem',
+              borderRadius: '2rem',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              width: { xs: '100%', md: '50%' },
+              position: 'relative',
+              maxWidth: '25rem',
+            }}
+          >
+            <DoughnutChart labels={['single chats', 'group chats']} value={[33, 55]} />
             <Stack sx={{
               position: 'absolute',
               display: 'flex',
@@ -74,7 +73,7 @@ const Dashboard = () => {
     </AdminLayout>
   )
 }
-const Widget = ({ title, value, Icon }) => <Paper elevation={3} sx={{ padding: '2rem', margin: '2rem 0', borderRadius: '1.5rem', width: '20rem'}}>
+const Widget = ({ title, value, Icon }) => <Paper elevation={3} sx={{ padding: '2rem', margin: '2rem 0', borderRadius: '1.5rem', width: '20rem' }}>
   <Stack alignItems={'center'} spacing={'1rem'}>
     <Box sx={{
       color: 'rgba(0,0,0,0.7)',
