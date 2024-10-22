@@ -9,6 +9,7 @@ import Person4Icon from '@mui/icons-material/Person4';
 import Groups3Icon from '@mui/icons-material/Groups3';
 import ChatIcon from '@mui/icons-material/Chat';
 import { CurveBtn, SearchField } from '../../components/styles/StyledComponent';
+import { DoughnutChart, LineChart } from '../../components/specific/Charts';
 
 
 const Dashboard = () => {
@@ -37,8 +38,11 @@ const Dashboard = () => {
         <Stack direction={'row'} spacing={'2rem'} flexWrap={'wrap'}>
           <Paper elevation={5} sx={{ padding: '2rem 3rem', borderRadius: '1rem', maxWidth: '45rem', width: '100%', height: '25rem' }}>
             <Typography variant='h5' margin={'1rem 2rem'}>last Message</Typography>
+            <LineChart value={[23,55,11,66]}/>
           </Paper>
-          <Paper sx={{
+          <Paper 
+          elevation={3}
+          sx={{
             padding: '1rem',
             borderRadius: '2rem',
             display: 'flex',
@@ -50,7 +54,7 @@ const Dashboard = () => {
             maxWidth: '25rem',
             height: '25rem'
           }}>
-            {'chart'}
+            <DoughnutChart/>
             <Stack sx={{
               position: 'absolute',
               display: 'flex',
