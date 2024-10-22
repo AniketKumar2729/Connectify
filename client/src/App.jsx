@@ -9,7 +9,10 @@ const Group = lazy(() => import("./pages/Group.jsx"));
 const NotFound = lazy(() => import("./pages/NotFound.jsx"))
 
 const AdminLogin=lazy(()=>import('./pages/admin/AdminLogin.jsx'));
-const Dashboard=lazy(()=>import('./pages/admin/Dashboard.jsx'))
+const Dashboard=lazy(()=>import('./pages/admin/Dashboard.jsx'));
+const ChatManagement=lazy(()=>import('./pages/admin/ChatManagement.jsx'))
+const UserManagement=lazy(()=>import('./pages/admin/UserManagement.jsx'))
+const MessageManagement=lazy(()=>import('./pages/admin/MessageManagement.jsx'))
 let user = true;
 function App() {
   return (
@@ -27,6 +30,9 @@ function App() {
             <Route path='/login' element={<ProtectedRoute user={!user} redirect='/'><Login /></ProtectedRoute>} />
             <Route path='/admin' element={<AdminLogin/>}/>
             <Route path='/admin/dashboard' element={<Dashboard/>}/>
+            <Route path='/admin/chats-management' element={<ChatManagement/>}/>
+            <Route path='/admin/user-management' element={<UserManagement/>}/>
+            <Route path='/admin/messages-management' element={<MessageManagement/>}/>
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
