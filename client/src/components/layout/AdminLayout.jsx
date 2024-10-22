@@ -1,21 +1,21 @@
+import CloseIcon from "@mui/icons-material/Close";
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import Groups3Icon from "@mui/icons-material/Groups3";
+import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
+import MenuIcon from "@mui/icons-material/Menu";
+import QuestionAnswerIcon from "@mui/icons-material/QuestionAnswer";
+import SpaceDashboardIcon from "@mui/icons-material/SpaceDashboard";
 import {
-  Box,
-  Drawer,
-  Grid,
-  IconButton,
-  Stack,
-  styled,
-  Typography,
+    Box,
+    Drawer,
+    Grid,
+    IconButton,
+    Stack,
+    styled,
+    Typography,
 } from "@mui/material";
 import React, { useState } from "react";
-import MenuIcon from "@mui/icons-material/Menu";
-import CloseIcon from "@mui/icons-material/Close";
-import SpaceDashboardIcon from "@mui/icons-material/SpaceDashboard";
-import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
-import Groups3Icon from "@mui/icons-material/Groups3";
-import QuestionAnswerIcon from "@mui/icons-material/QuestionAnswer";
-import ExitToAppIcon from '@mui/icons-material/ExitToApp';
-import { useLocation,Link as LinkComponent } from "react-router-dom";
+import { Link as LinkComponent, Navigate, useLocation } from "react-router-dom";
 const Link = styled(LinkComponent)`
 text-decoration:none;
 border-radius:2rem;
@@ -47,6 +47,7 @@ const adminTabs = [
     icon: <QuestionAnswerIcon />,
   },
 ];
+const isAdmin=true;
 const AdminLayout = ({ children }) => {
   const [isMobile, setIsMobile] = useState(false);
   const handleMobile = () => {
@@ -55,6 +56,7 @@ const AdminLayout = ({ children }) => {
   const handleClose = () => {
     setIsMobile((prev) => !prev);
   };
+  if(!isAdmin) return <Navigate to='/admin'/>
   return (
     <Grid container minHeight={"100vh"}>
       <Box
