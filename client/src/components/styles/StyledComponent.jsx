@@ -35,3 +35,25 @@ export const InputBox = styled('input')({
 
 })
 
+export const SearchField=styled('input')`
+padding:1rem 2rem;
+width:20vmax;
+border:none;
+outline:none;
+border-radius:1rem;
+background-color:#f1f1f1;
+font-size:1.1rem
+`
+export const CurveBtn=styled('button')`
+border-radius:1rem;
+padding:1rem 2rem;
+border: none;
+outline: none;
+cursor: pointer;
+background-color: black;
+color: white;
+font-size:1rem;
+&:hover{
+    background-color:rgba(0,0,0,0.8);
+}
+`
