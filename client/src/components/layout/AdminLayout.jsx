@@ -33,7 +33,7 @@ const adminTabs = [
   },
   {
     name: "Users",
-    path: "/admin/user-management ",
+    path: "/admin/user-management",
     icon: <ManageAccountsIcon />,
   },
   {
