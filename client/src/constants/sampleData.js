@@ -265,7 +265,7 @@ export const dashboardData = {
             avatar: ["https://img.freepik.com/premium-photo/group-boys-with-one-wearing-shirt-that-says-boys_806553-894.jpg?semt=ais_hybrid"],
             name: "Group-1",
             totalMember: 2,
-            members: [{_id:"1",avatar:'https://i.abcnewsfe.com/a/fd751005-a167-478b-bba2-ccaf61e26bf6/iron-man-rdjr-1-ht-thg-231204_1701712078177_hpMain.jpg'},{_id:"2",avatar:'https://i.pinimg.com/474x/fc/d6/e3/fcd6e3afdc58fc8235f177aa9dc93e0d.jpg'}],
+            members: [{ _id: "1", avatar: 'https://i.abcnewsfe.com/a/fd751005-a167-478b-bba2-ccaf61e26bf6/iron-man-rdjr-1-ht-thg-231204_1701712078177_hpMain.jpg' }, { _id: "2", avatar: 'https://i.pinimg.com/474x/fc/d6/e3/fcd6e3afdc58fc8235f177aa9dc93e0d.jpg' }],
             totalMessages: 20,
             creator: {
                 name: 'John Wick',
@@ -276,7 +276,7 @@ export const dashboardData = {
             avatar: ["https://img.freepik.com/free-vector/group-happy-smiling-people-looking-up-top-view-white-background-flat-vector-illustration_1284-78599.jpg"],
             name: "Group-2",
             totalMember: 4,
-            members: [{_id:'1',avatar:'https://cdn.britannica.com/73/182873-050-E1C686F4/Chris-Hemsworth-Thor-Thor-The-Dark-World.jpg'},{_id:'2',avatar:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRusBtNv5r6n0fwXG5o867OyEUXfA2zJcGazQ&s'},{_id:'3',avatar:"https://images.immediate.co.uk/production/volatile/sites/3/2023/10/daniel-craig-007.jpg-303a730-a0a1400.png"},{_id:'4',avatar:'https://png.pngtree.com/png-clipart/20230927/original/pngtree-man-avatar-image-for-profile-png-image_13001882.png", "https://www.creativefabrica.com/wp-content/uploads/2022/03/09/Woman-Icon-Teen-Profile-Graphics-26722130-1.jpg'}],
+            members: [{ _id: '1', avatar: 'https://cdn.britannica.com/73/182873-050-E1C686F4/Chris-Hemsworth-Thor-Thor-The-Dark-World.jpg' }, { _id: '2', avatar: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRusBtNv5r6n0fwXG5o867OyEUXfA2zJcGazQ&s' }, { _id: '3', avatar: "https://images.immediate.co.uk/production/volatile/sites/3/2023/10/daniel-craig-007.jpg-303a730-a0a1400.png" }, { _id: '4', avatar: 'https://png.pngtree.com/png-clipart/20230927/original/pngtree-man-avatar-image-for-profile-png-image_13001882.png", "https://www.creativefabrica.com/wp-content/uploads/2022/03/09/Woman-Icon-Teen-Profile-Graphics-26722130-1.jpg' }],
             totalMessages: 40,
             creator: {
                 name: 'Boogeyman',
@@ -284,5 +284,36 @@ export const dashboardData = {
             }
         },
     ],
+    messages: [
+        {
+            attachments: [],
+            content: "abcdefgh",
+            _id: '1234',
+            sender: {
+                name: "Tony Stark",
+                avatar: "https://i.abcnewsfe.com/a/fd751005-a167-478b-bba2-ccaf61e26bf6/iron-man-rdjr-1-ht-thg-231204_1701712078177_hpMain.jpg"
+            },
+            chat: 'chatId',
+            groupChat: false,
+            createdAt: '2024-10-20T10:00:00.630Z'
+        },
+        {
+            attachments: [
+                {
+                    public_id: '357',
+                    url: 'https://wallpapers.com/images/featured/really-cool-cars-pictures-7gub7gjfes26vk0c.jpg'
+                }
+            ],
+            content: "",
+            _id: '5678',
+            sender: {
+                avatar: "https://www.denofgeek.com/wp-content/uploads/2021/01/webstory-captain-america-cover03.jpg",
+                name: "Steve Rogers"
+            },
+            chat: 'chatId',
+            groupChat: true,
+            createdAt: '2024-10-20T10:00:00.630Z'
+        }
+    ]
 
 }
