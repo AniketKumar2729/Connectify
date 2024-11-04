@@ -8,3 +8,17 @@ export const connectDB = (uri) => {
     }).catch((error) => console.log(error)
     )
 }
+const cookieOption={
+    maxAge:15*24*60*60*1000,
+    sameSite:'none',
+    httpOnly:true,
+    secure:true
+}
+export const sendToken = (res, user, code, message) => {
+    const token = 'jksndfjkasn';
+    return res.status(code).cookie('Connectify-token',token,cookieOption).json({
+        success: true,
+        message,
+        user
+    })
+}
