@@ -5,3 +5,11 @@ export const errorHandler=(statusCode,message)=>{
     error.message=message;
     return error;
 }
+
+export const TryCatch=(passedFun)=>async(req,res,next)=>{
+    try {
+        await passedFun(req,res,next)
+    } catch (error) {
+        next(error)
+    }
+}
