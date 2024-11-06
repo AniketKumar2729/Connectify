@@ -1,7 +1,7 @@
 import { compare } from "bcrypt";
 import { errorHandler, TryCatch } from "../middlewares/errorHandler.middleware.js";
 import { User } from "../models/user.model.js";
-import { sendToken } from "../utils/features.utils.js";
+import { cookieOption, sendToken } from "../utils/features.utils.js";
 //create new user and save it to database and return cookie
 export const newUser = async (req, res) => {
     // console.log(req.body);
@@ -29,9 +29,19 @@ export const login = TryCatch(async (req, res, next) => {
     //    const {password:pass,...rest}=existedUser._doc; //this is how we separate the password from the rest of the field
     sendToken(res, existedUser, 200, `Welcome back,${existedUser.name}`);
 })
-export const getMyProfile = (req, res) => {
+export const getMyProfile = TryCatch(async (req, res) => {
+    const verifiedUser = await User.findById(req.userId).select("-password")
     res.status(200).json({
         success: true,
-        data: req.user
+        verifiedUser
     })
 }
+)
+
+export const logout=TryCatch(async (req, res) => {
+        return res.status(200).cookie("Connectify-token","",{...cookieOption,maxAge:0}).json({
+            success: true,
+            message:"Logout successfully"
+        })
+    }
+)

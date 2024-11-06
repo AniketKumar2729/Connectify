@@ -8,7 +8,7 @@ export const connectDB = (uri) => {
     }).catch((error) => console.log(error)
     )
 }
-const cookieOption={
+export const cookieOption={
     maxAge:15*24*60*60*1000,//cookie is valid for 15 days
     sameSite:'none',
     httpOnly:true,

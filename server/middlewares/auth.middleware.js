@@ -8,8 +8,7 @@ export const isAuthenticated = TryCatch(async (req, res, next) => {
     if (!token)
         return next(errorHandler(401, "please login to handle this route"));
     const decodedData = jwt.verify(token, process.env.JWT_SECRET);
-    req.user=decodedData._id  
+    req.userId=decodedData._id  
     next();
-
 }
 )
