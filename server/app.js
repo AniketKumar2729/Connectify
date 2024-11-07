@@ -2,6 +2,7 @@ import express from "express";
 import { userRouter } from "./routes/user.routes.js";
 import { connectDB } from "./utils/features.utils.js";
 import cookieParser from "cookie-parser";
+import { chatRouter } from "./routes/chat.routes.js";
 connectDB()
 const app = express();
 app.listen(3000, () => {
@@ -15,6 +16,7 @@ app.use(express.json());
 // app.use(express.urlencoded());
 app.use(cookieParser())
 app.use('/user', userRouter)
+app.use('/chat',chatRouter)
 app.get('/', (req, res) => {
     res.send("hello user")
 })
