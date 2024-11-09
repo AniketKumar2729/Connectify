@@ -1,6 +1,6 @@
 import express from "express";
 import { isAuthenticated } from "../middlewares/auth.middleware.js";
-import { getMyChats, getMyGroups, newGroupChat } from "../controllers/chat.controller.js";
+import { addMembers, getMyChats, getMyGroups, newGroupChat } from "../controllers/chat.controller.js";
 
 
 const chatRouter = express.Router();
@@ -10,4 +10,5 @@ chatRouter.use(isAuthenticated);
 chatRouter.post('/new',newGroupChat)
 chatRouter.get('/my',getMyChats)
 chatRouter.get('/my/groups',getMyGroups)
+chatRouter.put("/addMembers",addMembers)
 export { chatRouter };

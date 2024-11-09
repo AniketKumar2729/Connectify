@@ -2,6 +2,7 @@ import { ALERT, REFETCH_CHATS } from "../constants/event.constants.js";
 import { getOtherMember } from "../lib/helper.lib.js";
 import { errorHandler, TryCatch } from "../middlewares/errorHandler.middleware.js"
 import { Chat } from "../models/chat.model.js";
+import { User } from "../models/user.model.js";
 import { emitEvent } from "../utils/features.utils.js";
 
 const newGroupChat = TryCatch(async(req,res,next)=>{
@@ -60,5 +61,30 @@ const getMyGroups=TryCatch(async(req,res,next)=>{
         groups
     })
 })
+const addMembers=TryCatch(async(req,res,next)=>{
+    const {groupId,members}=req.body
+    // const {chatId,members}=req.body;
+    
+    const verifiedGroup=await Chat.findById(groupId)
+    if(!verifiedGroup)
+        return next(errorHandler(404,"Group Not found"))
+    if(!verifiedGroup.groupChat)
+        return next(errorHandler(400,"This is not an Group Chat"))
+    if(verifiedGroup.creator.toString()!==req.userId.toString())
+        return next(errorHandler(403,'You are not allowed to add members'))
+    const allNewMemberPromise=members.map(i=>User.findById(i,'name'))
+    const allNewMembers=await Promise.all(allNewMemberPromise)
+    verifiedGroup.members.push(...allNewMembers.map((i)=>i._id))
+    if(verifiedGroup.members.length>100)
+        return next(errorHandler(400,"Maximum members add into the group"))
+    await verifiedGroup.save();
+    const allUserName=allNewMembers.map((i)=>i.name).join(",")
+    emitEvent(req,ALERT,verifiedGroup.members,`${allUserName} has been added to ${verifiedGroup.name} group`)
+    emitEvent(req,REFETCH_CHATS,verifiedGroup.members)
+    return res.status(200).json({
+        success:true,
+        message:"Members added successfully"
+    })
 
-export { newGroupChat,getMyChats,getMyGroups }
+})
+export { newGroupChat,getMyChats,getMyGroups,addMembers }
