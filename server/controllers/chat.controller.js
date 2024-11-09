@@ -63,9 +63,9 @@ const getMyGroups=TryCatch(async(req,res,next)=>{
 })
 const addMembers=TryCatch(async(req,res,next)=>{
     const {groupId,members}=req.body
-    // const {chatId,members}=req.body;
-    
-    const verifiedGroup=await Chat.findById(groupId)
+    if(!members||members.length<1)
+        return next(errorHandler(400,"Please provide members"))
+    const verifiedGroup=await Chat.findById(groupId)    
     if(!verifiedGroup)
         return next(errorHandler(404,"Group Not found"))
     if(!verifiedGroup.groupChat)
@@ -74,7 +74,8 @@ const addMembers=TryCatch(async(req,res,next)=>{
         return next(errorHandler(403,'You are not allowed to add members'))
     const allNewMemberPromise=members.map(i=>User.findById(i,'name'))
     const allNewMembers=await Promise.all(allNewMemberPromise)
-    verifiedGroup.members.push(...allNewMembers.map((i)=>i._id))
+    const uniqueMembers=allNewMembers.filter(i=>!verifiedGroup.members.includes(i._id.toString())).map(i=>i._id)
+    verifiedGroup.members.push(...uniqueMembers)
     if(verifiedGroup.members.length>100)
         return next(errorHandler(400,"Maximum members add into the group"))
     await verifiedGroup.save();
@@ -87,4 +88,24 @@ const addMembers=TryCatch(async(req,res,next)=>{
     })
 
 })
-export { newGroupChat,getMyChats,getMyGroups,addMembers }
+const removeMembers=TryCatch(async(req,res,next)=>{
+    const {userId,groupId}=req.body
+    const [group,userRemoved]=await Promise.all([Chat.findById(groupId),User.findById(userId,'name')])
+    if(!group)
+        return next(errorHandler(404,"Group Not found"))
+    if(!group.groupChat)
+        return next(errorHandler(400,"This is not an Group Chat"))
+    if(group.creator.toString()=== userId)
+        return next(errorHandler(403,'You are not allowed to remove members'))
+    if(group.members.length<=3)
+        return next(errorHandler(400,"Group must have atleast 3 members"))
+    group.members=group.members.filter((membersId)=>membersId.toString()!==userId.toString())
+    await group.save()
+    emitEvent(req,ALERT,group.members,`${userRemoved.name} has been removed from the group`)
+    emitEvent(req,REFETCH_CHATS,group.members)
+    return res.status(200).json({
+        success:true,
+        message:"Member removed successfully"
+    })
+})
+export { newGroupChat,getMyChats,getMyGroups,addMembers,removeMembers}

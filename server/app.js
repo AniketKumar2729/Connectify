@@ -3,11 +3,11 @@ import { userRouter } from "./routes/user.routes.js";
 import { connectDB } from "./utils/features.utils.js";
 import cookieParser from "cookie-parser";
 import { chatRouter } from "./routes/chat.routes.js";
+import { createUser } from "./seeders/users.seeders.js";
 connectDB()
 const app = express();
 app.listen(3000, () => {
     console.log("server is listening");
-
 })
 //using middleware
 //express.json() is used when we hit the endpoint with thunder client we  type json in body
