@@ -26,4 +26,3 @@ try {
     
 }
 }
-createUser(10);
