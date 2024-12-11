@@ -158,7 +158,7 @@ const sendAttachments = TryCatch(async (req, res, next) => {
 //const chatDetails=TryCatch()
 const getGroupDetails = TryCatch(async (req, res, next) => {
     if (req.query.populate === "true") {
-        console.log("Populate");        
+        console.log("Populate");
         const group = await Chat.findById(req.params.id).populate("members", "name avatar").lean()
         if (!group)
             return next(errorHandler(404, "Group not found"));
@@ -182,4 +182,22 @@ const getGroupDetails = TryCatch(async (req, res, next) => {
         })
     }
 })
-export { newGroupChat, getMyChats, getMyGroups, addMembers, removeMembers, leaveGroup, sendAttachments, getGroupDetails }
+const renameGroup = TryCatch(async (req, res, next) => {
+    const groupId = req.params.id;
+    const { groupname } = req.body;
+    const group = await Chat.findById(groupId)
+    if (!group)
+        return next(errorHandler(404, "Group not found"))
+    if (!group.groupChat)
+        return next(errorHandler(400,"This is not Group Chat"))
+    if(group.creator.toString()!==req.userId.toString())
+        return next(errorHandler(403,"You are not allowed to rename the group"))
+    group.name=groupname;
+    await group.save();
+    emitEvent(req,REFETCH_CHATS,group.members)
+    return res.status(200).json({
+        success:true,
+        message:"Group is renamed"
+    })
+})
+export { newGroupChat, getMyChats, getMyGroups, addMembers, removeMembers, leaveGroup, sendAttachments, getGroupDetails, renameGroup }
