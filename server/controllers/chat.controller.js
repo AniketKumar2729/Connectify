@@ -1,8 +1,9 @@
-import { ALERT, REFETCH_CHATS } from "../constants/event.constants.js";
+import { ALERT, NEW_ATTACHMENTS, NEW_MESSAGE_ALERT, REFETCH_CHATS } from "../constants/event.constants.js";
 import { getOtherMember } from "../lib/helper.lib.js";
 import { errorHandler, TryCatch } from "../middlewares/errorHandler.middleware.js"
 import { Chat } from "../models/chat.model.js";
 import { User } from "../models/user.model.js";
+import {Message} from "../models/message.model.js";
 import { emitEvent } from "../utils/features.utils.js";
 
 const newGroupChat = TryCatch(async(req,res,next)=>{
@@ -131,4 +132,27 @@ const leaveGroup=TryCatch(async(req,res,next)=>{
         message:"Member leaved successfully"
     })
 })
-export { newGroupChat,getMyChats,getMyGroups,addMembers,removeMembers,leaveGroup}
+const sendAttachments=TryCatch(async(req,res,next)=>{
+    const {chatId}=req.body;
+    const [verifiedChat,verifiedUser]=await Promise.all([Chat.findById(chatId),User.findById(req.userId,'name')])    
+    console.log(verifiedChat,verifiedUser)
+    const files=req.files||[];
+    if(!verifiedChat)
+        return next(errorHandler(404,"Chat not found"))
+    if(files.length<1)
+        return next(errorHandler(400,"Please provide some attachments"))
+    //upload file here
+    const attachments=[]
+    const messageForRealTime={content:"",attachments,sender:{_id:verifiedUser._id,name:verifiedUser.name},chat:chatId} //this is for web socket(Socket.io)
+    const messageForDB={content:"",attachments,sender:verifiedUser._id,chat:chatId}//this is for database
+    const message=await Message.create(messageForDB)
+    emitEvent(req,NEW_ATTACHMENTS,verifiedChat.members,{message:messageForRealTime,chatId})
+    emitEvent(req,NEW_MESSAGE_ALERT,verifiedChat.members,{chatId})
+    return res.status(200).json({
+        success:true,
+        message
+    })
+}
+
+)
+export { newGroupChat,getMyChats,getMyGroups,addMembers,removeMembers,leaveGroup,sendAttachments}
