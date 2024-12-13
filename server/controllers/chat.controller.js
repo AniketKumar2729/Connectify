@@ -223,12 +223,23 @@ const deleteChat = TryCatch(async (req, res, next) => {
         //delete files from cloudinary
         deleteFilesFromCloudinary(public_ids),
         verifiedChat.deleteOne(),
-        Message.deleteMany({chat:chatId})
+        Message.deleteMany({ chat: chatId })
     ])
-    emitEvent(req,REFETCH_CHATS,members)
+    emitEvent(req, REFETCH_CHATS, members)
     return res.status(200).json({
-        success:true,
-        message:"Chat deleted successfully"
+        success: true,
+        message: "Chat deleted successfully"
     })
 })
-export { newGroupChat, getMyChats, getMyGroups, addMembers, removeMembers, leaveGroup, sendAttachments, getGroupDetails, renameGroup, deleteChat }
+const getMessages = TryCatch(async (req, res, next) => {
+    const chatId = req.params.id;
+    const { page = 1 } = req.query
+    const resultPerPage = 20
+    const skip = (page - 1) * resultPerPage
+    const [messages, totalMessagesCount] = await Promise.all([Message.find({ chat: chatId }).sort({ createdAt: -1 }).skip(skip).limit(resultPerPage).populate("sender", "name").lean(), Message.countDocuments({ chat: chatId })])
+    const totalPage=Math.ceil(totalMessagesCount/resultPerPage)
+    return res.status(200).json({success:true,messages:messages,totalPage:totalPage})
+
+
+})
+export { newGroupChat, getMyChats, getMyGroups, addMembers, removeMembers, leaveGroup, sendAttachments, getGroupDetails, renameGroup, deleteChat, getMessages }
