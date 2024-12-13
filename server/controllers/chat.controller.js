@@ -4,7 +4,7 @@ import { errorHandler, TryCatch } from "../middlewares/errorHandler.middleware.j
 import { Chat } from "../models/chat.model.js";
 import { User } from "../models/user.model.js";
 import { Message } from "../models/message.model.js";
-import { emitEvent } from "../utils/features.utils.js";
+import { deleteFilesFromCloudinary, emitEvent } from "../utils/features.utils.js";
 
 const newGroupChat = TryCatch(async (req, res, next) => {
     const { name, members } = req.body
@@ -189,15 +189,46 @@ const renameGroup = TryCatch(async (req, res, next) => {
     if (!group)
         return next(errorHandler(404, "Group not found"))
     if (!group.groupChat)
-        return next(errorHandler(400,"This is not Group Chat"))
-    if(group.creator.toString()!==req.userId.toString())
-        return next(errorHandler(403,"You are not allowed to rename the group"))
-    group.name=groupname;
+        return next(errorHandler(400, "This is not Group Chat"))
+    if (group.creator.toString() !== req.userId.toString())
+        return next(errorHandler(403, "You are not allowed to rename the group"))
+    group.name = groupname;
     await group.save();
-    emitEvent(req,REFETCH_CHATS,group.members)
+    emitEvent(req, REFETCH_CHATS, group.members)
     return res.status(200).json({
-        success:true,
-        message:"Group is renamed"
+        success: true,
+        message: "Group is renamed"
     })
 })
-export { newGroupChat, getMyChats, getMyGroups, addMembers, removeMembers, leaveGroup, sendAttachments, getGroupDetails, renameGroup }
+const deleteChat = TryCatch(async (req, res, next) => {
+    const verfiedUser = req.userId;
+    const chatId = req.params.id
+    const verifiedChat = await Chat.findById(chatId)
+    if (!verifiedChat)
+        return next(errorHandler(404, "Chat not found"))
+    const members = verifiedChat.members;
+    if (verifiedChat.groupChat && verifiedChat.creator.toString() !== verfiedUser.toString()) {
+        return next(errorHandler(403, "You are not allowed to delete the group"))
+    }
+    if (!verifiedChat.groupChat && !verifiedChat.members.includes(verfiedUser.toString()))
+        return next(errorHandler(403, "You are not allowed to delete the chat"))
+    const messageWithAttachments = await Message.find({ chat: chatId, attachments: { $exists: true, $ne: [] } })
+    const public_ids = [];
+    messageWithAttachments.forEach(({ attachments }) =>
+        attachments.forEach(({ public_id }) => {
+            public_ids.push(public_id)
+        })
+    )
+    await Promise.all([
+        //delete files from cloudinary
+        deleteFilesFromCloudinary(public_ids),
+        verifiedChat.deleteOne(),
+        Message.deleteMany({chat:chatId})
+    ])
+    emitEvent(req,REFETCH_CHATS,members)
+    return res.status(200).json({
+        success:true,
+        message:"Chat deleted successfully"
+    })
+})
+export { newGroupChat, getMyChats, getMyGroups, addMembers, removeMembers, leaveGroup, sendAttachments, getGroupDetails, renameGroup, deleteChat }
