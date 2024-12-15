@@ -43,6 +43,9 @@ export const renameGroupValidator = () => [
 export const deleteChatValidator = () => [
     param("id","Please provide Chat ID").notEmpty(),
 ]
+export const friendRequestValidator = () => [
+    body("receiverId","Please provide receiver ID").notEmpty(),
+]
 
 export const validateHandler = (req, res, next) => {
     const errors = validationResult(req)

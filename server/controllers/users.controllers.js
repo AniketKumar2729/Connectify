@@ -2,7 +2,9 @@ import { compare } from "bcrypt";
 import { errorHandler, TryCatch } from "../middlewares/errorHandler.middleware.js";
 import { User } from "../models/user.model.js";
 import { Chat } from "../models/chat.model.js";
-import { cookieOption, sendToken } from "../utils/features.utils.js";
+import { cookieOption, emitEvent, sendToken } from "../utils/features.utils.js";
+import { Request } from "../models/request.model.js";
+import { NEW_REQUEST } from "../constants/event.constants.js";
 //create new user and save it to database and return cookie
 export const newUser = async (req, res) => {
     // console.log(req.body);
@@ -47,26 +49,46 @@ export const logout = TryCatch(async (req, res) => {
 }
 )
 export const searchUser = TryCatch(async (req, res, next) => {
-    const { name="" } = req.query
+    const { name = "" } = req.query
     //Finding All my chats
     const myChats = await Chat.find({
-        groupChat:false,
-        members:req.userId
+        groupChat: false,
+        members: req.userId
     })
     //extracting all users from my chats means friends or people I chatted with
-    const allUserFromMyChats=myChats.map((chat)=>chat.members).flat()
+    const allUserFromMyChats = myChats.map((chat) => chat.members).flat()
     //finding all users execpt me and my friends
-    const allUserExceptMeAndFriends=await User.find({_id:{$nin:allUserFromMyChats},name:{$regex:name,$options:'i'}})
+    const allUserExceptMeAndFriends = await User.find({ _id: { $nin: allUserFromMyChats }, name: { $regex: name, $options: 'i' } })
     //modifying response
-    const users=allUserExceptMeAndFriends.map(({_id,name,avatar})=>({
+    const users = allUserExceptMeAndFriends.map(({ _id, name, avatar }) => ({
         _id,
         name,
-        avatar:avatar.url
+        avatar: avatar.url
     }))
     // console.log(allUserExceptMeAndFriends);
-    const totalChats=myChats.length
+    const totalChats = myChats.length
     return res.status(200).json({
-        success:true,
-     users
+        success: true,
+        users
+    })
+})
+export const sendFriendRequrest = TryCatch(async (req, res, next) => {
+    const { receiverId } = req.body
+    const request = await Request.findOne({
+        $or: [
+            { sender: req.userId, receiver: receiverId },
+            { sender: receiverId, receiver: req.userId }
+        ]
+    })
+    if (request)
+        return next(errorHandler(400, "Request already sent"))
+    await Request.create({
+        sender: req.userId,
+        receiver: receiverId
+    })
+    emitEvent(req, NEW_REQUEST, [receiverId])
+    res.status(200).json({
+        success: true,
+        message: "Friend Request Sent"
     })
 })
