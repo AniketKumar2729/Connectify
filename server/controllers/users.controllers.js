@@ -1,6 +1,7 @@
 import { compare } from "bcrypt";
 import { errorHandler, TryCatch } from "../middlewares/errorHandler.middleware.js";
 import { User } from "../models/user.model.js";
+import { Chat } from "../models/chat.model.js";
 import { cookieOption, sendToken } from "../utils/features.utils.js";
 //create new user and save it to database and return cookie
 export const newUser = async (req, res) => {
@@ -38,10 +39,34 @@ export const getMyProfile = TryCatch(async (req, res) => {
 }
 )
 
-export const logout=TryCatch(async (req, res) => {
-        return res.status(200).cookie("Connectify-token","",{...cookieOption,maxAge:0}).json({
-            success: true,
-            message:"Logout successfully"
-        })
-    }
+export const logout = TryCatch(async (req, res) => {
+    return res.status(200).cookie("Connectify-token", "", { ...cookieOption, maxAge: 0 }).json({
+        success: true,
+        message: "Logout successfully"
+    })
+}
 )
+export const searchUser = TryCatch(async (req, res, next) => {
+    const { name="" } = req.query
+    //Finding All my chats
+    const myChats = await Chat.find({
+        groupChat:false,
+        members:req.userId
+    })
+    //extracting all users from my chats means friends or people I chatted with
+    const allUserFromMyChats=myChats.map((chat)=>chat.members).flat()
+    //finding all users execpt me and my friends
+    const allUserExceptMeAndFriends=await User.find({_id:{$nin:allUserFromMyChats},name:{$regex:name,$options:'i'}})
+    //modifying response
+    const users=allUserExceptMeAndFriends.map(({_id,name,avatar})=>({
+        _id,
+        name,
+        avatar:avatar.url
+    }))
+    // console.log(allUserExceptMeAndFriends);
+    const totalChats=myChats.length
+    return res.status(200).json({
+        success:true,
+     users
+    })
+})
