@@ -64,8 +64,6 @@ const getMyGroups = TryCatch(async (req, res, next) => {
 })
 const addMembers = TryCatch(async (req, res, next) => {
     const { groupId, members } = req.body
-    if (!members || members.length < 1)
-        return next(errorHandler(400, "Please provide members"))
     const verifiedGroup = await Chat.findById(groupId)
     if (!verifiedGroup)
         return next(errorHandler(404, "Group Not found"))
