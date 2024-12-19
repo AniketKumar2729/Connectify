@@ -1,8 +1,9 @@
 import express from "express";
-import { userRouter } from "./routes/user.routes.js";
 import { connectDB } from "./utils/features.utils.js";
 import cookieParser from "cookie-parser";
 import { chatRouter } from "./routes/chat.routes.js";
+import { userRouter } from "./routes/user.routes.js";
+import { adminRouter } from "./routes/admin.routes.js";
 import { createSampleGroupChat, createSampleMessage, createSampleMessageInAGroup, createSampleSingleChat, createUser } from "./seeders/users.seeders.js";
 connectDB()
 const app = express();
@@ -22,6 +23,7 @@ app.use(express.json());
 app.use(cookieParser())
 app.use('/user', userRouter)
 app.use('/chat',chatRouter)
+app.use('/admin',adminRouter)
 app.get('/', (req, res) => {
     res.send("hello user")
 })
