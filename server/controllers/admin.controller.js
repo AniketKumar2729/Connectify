@@ -20,6 +20,35 @@ export const getAllUsers = TryCatch(async (req, res, next) => {
     return res.status(200).json({
         sucess: true,
         totalUser: users.length,
-        users:transformedUsers
+        users: transformedUsers
+    })
+})
+export const getAllChats = TryCatch(async (req, res, next) => {
+    const chat = await Chat.find({}).populate("members", "name avatar").populate("creator", "name avatar")
+    const transFormedChats = await Promise.all(chat.map(async ({ members, _id, groupChat, name, creator }) => {
+        const totalMessage=await Message.countDocuments({chat:_id})
+        return {
+            _id,
+            groupChat,
+            name,
+            avatar: members.slice(0, 3).map((member) => member.avatar.url),
+            members: members.map(({ _id, name, avatar }) => ({
+                _id,
+                name,
+                avatar: avatar.url
+            }
+            )),
+            creator:{
+                name:creator?.name||"None",
+                avatar:creator?.avatar.url||""
+            },
+            totalMembers:members.length,
+            totalMessage
+        }
+    }))
+    return res.status(200).json({
+        sucess: true,
+        totalChats: chat.length,
+        chats: transFormedChats
     })
 })

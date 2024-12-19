@@ -1,6 +1,7 @@
 import express from "express";
-import { getAllUsers } from "../controllers/admin.controller.js";
+import { getAllChats, getAllUsers } from "../controllers/admin.controller.js";
 const adminRouter = express.Router();
 adminRouter.get('/allUsers',getAllUsers)
+adminRouter.get("/allChats",getAllChats)
 export { adminRouter };
 
