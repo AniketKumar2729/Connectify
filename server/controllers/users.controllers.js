@@ -5,6 +5,7 @@ import { Chat } from "../models/chat.model.js";
 import { cookieOption, emitEvent, sendToken } from "../utils/features.utils.js";
 import { Request } from "../models/request.model.js";
 import { NEW_REQUEST, REFETCH_CHATS } from "../constants/event.constants.js";
+import { getOtherMember } from "../lib/helper.lib.js";
 //create new user and save it to database and return cookie
 export const newUser = async (req, res) => {
     // console.log(req.body);
@@ -135,4 +136,31 @@ export const getMyNotificatoins = TryCatch(async (req, res, next) => {
         success: true,
         request: allRequest
     })
+})
+
+export const getMyFriends = TryCatch(async (req, res, next) => {
+    const chatId=req.query.ChatId
+    const chats=await Chat.find({members:req.userId,groupChat:false}).populate("members","name avatar")
+    const friends=chats.map(({members})=>{
+        const otherUser=getOtherMember(members,req.userId)
+        return{
+            _id:otherUser._id,
+            name:otherUser.name,
+            avatar:otherUser.avatar.url
+        }
+    })
+    if(chatId){
+        const chat=await Chat.findById(chatId)
+        const availableFriends=friends.filter((friend)=>!chat.members.include(friend._id))
+        return res.status(200).json({
+            success: true,
+            friends:availableFriends
+        })
+    }else{
+        return res.status(200).json({
+            success: true,
+            friends
+        })
+    }
+    
 })
