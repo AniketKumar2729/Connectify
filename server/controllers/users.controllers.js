@@ -4,7 +4,7 @@ import { User } from "../models/user.model.js";
 import { Chat } from "../models/chat.model.js";
 import { cookieOption, emitEvent, sendToken } from "../utils/features.utils.js";
 import { Request } from "../models/request.model.js";
-import { NEW_REQUEST } from "../constants/event.constants.js";
+import { NEW_REQUEST, REFETCH_CHATS } from "../constants/event.constants.js";
 //create new user and save it to database and return cookie
 export const newUser = async (req, res) => {
     // console.log(req.body);
@@ -90,5 +90,49 @@ export const sendFriendRequrest = TryCatch(async (req, res, next) => {
     res.status(200).json({
         success: true,
         message: "Friend Request Sent"
+    })
+})
+export const acceptFriendRequrest = TryCatch(async (req, res, next) => {
+    
+    const { requestId, accept } = req.body    
+    const request = await Request.findById(requestId).populate('sender', 'name').populate("receiver", "name")
+    // console.log(req.userId)
+    console.log(request)
+    if (!request)
+        return next(errorHandler(404, "Request not found"))
+    if (request.receiver._id.toString() !== req.userId.toString())
+        return next(errorHandler(401, "Unauthoried"))
+    if (!accept) {
+        await request.deleteOne()
+        return res.status(200).json({
+            success: true,
+            message: "Friend Request Rejected"
+        })
+    }
+    const members = [request.sender._id, request.receiver._id]
+    await Promise.all([Chat.create({
+        members,
+        name: `${request.sender.name} -- ${request.receiver.name}`
+    }), request.deleteOne()])
+    emitEvent(req, REFETCH_CHATS, members)
+    return res.status(200).json({
+        success: true,
+        message: "Friend Request accepted",
+        senderId: request.sender._id
+    })
+})
+
+export const getMyNotificatoins = TryCatch(async (req, res, next) => {
+    const request = await Request.find({ receiver: req.userId }).populate("sender", "name avatar")
+    const allRequest = request.map(({ _id, sender }) => ({
+        _id, sender: {
+            _id: sender._id,
+            name: sender.name,
+            avatar: sender.avatar.url
+        }
+    }))
+    return res.status(200).json({
+        success: true,
+        request: allRequest
     })
 })
