@@ -26,7 +26,7 @@ export const getAllUsers = TryCatch(async (req, res, next) => {
 export const getAllChats = TryCatch(async (req, res, next) => {
     const chat = await Chat.find({}).populate("members", "name avatar").populate("creator", "name avatar")
     const transFormedChats = await Promise.all(chat.map(async ({ members, _id, groupChat, name, creator }) => {
-        const totalMessage=await Message.countDocuments({chat:_id})
+        const totalMessage = await Message.countDocuments({ chat: _id })
         return {
             _id,
             groupChat,
@@ -38,11 +38,11 @@ export const getAllChats = TryCatch(async (req, res, next) => {
                 avatar: avatar.url
             }
             )),
-            creator:{
-                name:creator?.name||"None",
-                avatar:creator?.avatar.url||""
+            creator: {
+                name: creator?.name || "None",
+                avatar: creator?.avatar.url || ""
             },
-            totalMembers:members.length,
+            totalMembers: members.length,
             totalMessage
         }
     }))
@@ -50,5 +50,27 @@ export const getAllChats = TryCatch(async (req, res, next) => {
         sucess: true,
         totalChats: chat.length,
         chats: transFormedChats
+    })
+})
+
+export const getAllMessage = TryCatch(async (req, res, next) => {
+    const messages = await Message.find({}).populate('sender', 'name avatar').populate("chat", "groupChat")
+    const transFormedMessages=messages.map(({content,_id,attachments,sender,createdAt,chat})=>({
+        _id,
+        attachments,
+        content,
+        createdAt,
+        sender:{
+            _id:sender._id,
+            name:sender.name,
+            avatar:sender.avatar.url
+        },
+        chatId:chat._id,
+        groupChat:chat.groupChat
+    }))
+    return res.status(200).json({
+        sucess: true,
+        totolMessage:messages.length,
+        messages:transFormedMessages
     })
 })
