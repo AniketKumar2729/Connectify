@@ -50,7 +50,9 @@ export const friendRequestAcceptValidator = () => [
     body("accept").notEmpty().withMessage("Please add accept").isBoolean().withMessage("Accept must be Yes or No"),
     body("requestId", "Please provide request ID").notEmpty(),
 ]
-
+export const adminLoginValidator=()=>[
+    body('secretKey').notEmpty().withMessage("Please provide the secret key")
+]
 export const validateHandler = (req, res, next) => {
     const errors = validationResult(req)
     const errorMessage = errors.array().map((error) => error.msg).join(", ")
