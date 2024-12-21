@@ -132,9 +132,13 @@ const leaveGroup = TryCatch(async (req, res, next) => {
 })
 const sendAttachments = TryCatch(async (req, res, next) => {
     const { chatId } = req.body;
+    const files = req.files || [];
+    if (files.length < 1)
+        return next(errorHandler(400, "Please upload attachments"))
+    if(files.length>5)
+        return next(errorHandler(400,"Files can' be more than 5"))
     const [verifiedChat, verifiedUser] = await Promise.all([Chat.findById(chatId), User.findById(req.userId, 'name')])
     console.log(verifiedChat, verifiedUser)
-    const files = req.files || [];
     if (!verifiedChat)
         return next(errorHandler(404, "Chat not found"))
     if (files.length < 1)
@@ -156,7 +160,6 @@ const sendAttachments = TryCatch(async (req, res, next) => {
 //const chatDetails=TryCatch()
 const getGroupDetails = TryCatch(async (req, res, next) => {
     if (req.query.populate === "true") {
-        console.log("Populate");
         const group = await Chat.findById(req.params.id).populate("members", "name avatar").lean()
         if (!group)
             return next(errorHandler(404, "Group not found"));
@@ -171,7 +174,6 @@ const getGroupDetails = TryCatch(async (req, res, next) => {
         })
     } else {
         const group = await Chat.findById(req.params.id)
-        console.log("Not Populate");
         if (!group)
             return next(errorHandler(404, "Group not found"));
         return res.status(200).json({
@@ -235,8 +237,8 @@ const getMessages = TryCatch(async (req, res, next) => {
     const resultPerPage = 20
     const skip = (page - 1) * resultPerPage
     const [messages, totalMessagesCount] = await Promise.all([Message.find({ chat: chatId }).sort({ createdAt: -1 }).skip(skip).limit(resultPerPage).populate("sender", "name").lean(), Message.countDocuments({ chat: chatId })])
-    const totalPage=Math.ceil(totalMessagesCount/resultPerPage)
-    return res.status(200).json({success:true,messages:messages,totalPage:totalPage})
+    const totalPage = Math.ceil(totalMessagesCount / resultPerPage)
+    return res.status(200).json({ success: true, messages: messages, totalPage: totalPage })
 
 
 })

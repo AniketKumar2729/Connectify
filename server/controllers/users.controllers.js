@@ -7,7 +7,7 @@ import { Request } from "../models/request.model.js";
 import { NEW_REQUEST, REFETCH_CHATS } from "../constants/event.constants.js";
 import { getOtherMember } from "../lib/helper.lib.js";
 //create new user and save it to database and return cookie
-export const newUser = async (req, res) => {
+export const newUser = TryCatch(async (req, res,next) => {
     // console.log(req.body);
     //this is static data and it will store in database
     const avatar = {
@@ -15,11 +15,13 @@ export const newUser = async (req, res) => {
         url: "sfjkhdfjkhdsjhk"
     }
     // await User.create({name:"Aniket",username:"aniket2729",password:"123456",avatar})
-
+    // const file = req.file;
+    // if (!file) return next(errorHandler(400, "Please upload Image"))
     const { name, username, password, bio } = req.body;
     const newUser = await User.create({ name, username, password, bio, avatar })
     sendToken(res, newUser, 201, "User Created");
 }
+)
 export const login = TryCatch(async (req, res, next) => {
     const { username, password } = req.body;
     const existedUser = await User.findOne({ username }).select("+password"); //.select is used because in our model we separated the password and then send the response due to select() we can get password also
@@ -94,8 +96,8 @@ export const sendFriendRequrest = TryCatch(async (req, res, next) => {
     })
 })
 export const acceptFriendRequrest = TryCatch(async (req, res, next) => {
-    
-    const { requestId, accept } = req.body    
+
+    const { requestId, accept } = req.body
     const request = await Request.findById(requestId).populate('sender', 'name').populate("receiver", "name")
     // console.log(req.userId)
     console.log(request)
@@ -139,28 +141,28 @@ export const getMyNotificatoins = TryCatch(async (req, res, next) => {
 })
 
 export const getMyFriends = TryCatch(async (req, res, next) => {
-    const chatId=req.query.ChatId
-    const chats=await Chat.find({members:req.userId,groupChat:false}).populate("members","name avatar")
-    const friends=chats.map(({members})=>{
-        const otherUser=getOtherMember(members,req.userId)
-        return{
-            _id:otherUser._id,
-            name:otherUser.name,
-            avatar:otherUser.avatar.url
+    const chatId = req.query.ChatId
+    const chats = await Chat.find({ members: req.userId, groupChat: false }).populate("members", "name avatar")
+    const friends = chats.map(({ members }) => {
+        const otherUser = getOtherMember(members, req.userId)
+        return {
+            _id: otherUser._id,
+            name: otherUser.name,
+            avatar: otherUser.avatar.url
         }
     })
-    if(chatId){
-        const chat=await Chat.findById(chatId)
-        const availableFriends=friends.filter((friend)=>!chat.members.include(friend._id))
+    if (chatId) {
+        const chat = await Chat.findById(chatId)
+        const availableFriends = friends.filter((friend) => !chat.members.include(friend._id))
         return res.status(200).json({
             success: true,
-            friends:availableFriends
+            friends: availableFriends
         })
-    }else{
+    } else {
         return res.status(200).json({
             success: true,
             friends
         })
     }
-    
+
 })

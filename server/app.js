@@ -22,18 +22,29 @@ app.use(express.json());
 // app.use(express.urlencoded());
 app.use(cookieParser())
 app.use('/user', userRouter)
-app.use('/chat',chatRouter)
-app.use('/admin',adminRouter)
+app.use('/chat', chatRouter)
+app.use('/admin', adminRouter)
 app.get('/', (req, res) => {
     res.send("hello user")
 })
 //Error handling middleware
 app.use((err, req, res, next) => {
-    const statusCode = err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
+    let statusCode = err.statusCode || 500;
+    let message = err.message || "Internal Server Error";
+    if (err.code === 11000) {
+        const error=Object.keys(err.keyPattern).join(",")
+        message=`Duplicate field -> ${error}`
+        statusCode=400
+    }
+    if(err.name==="CastError"){
+        const errorPath=err.path
+        message=`Invalid format of -> ${errorPath}`
+        statusCode=400
+    }
     res.status(statusCode).json({
         success: false,
         statusCode,
+        // err
         message,
     });
 })

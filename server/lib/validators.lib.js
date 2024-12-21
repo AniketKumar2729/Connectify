@@ -1,11 +1,10 @@
-import { body, param, validationResult, check, query } from 'express-validator'
+import { body, param, validationResult } from 'express-validator'
 import { errorHandler } from '../middlewares/errorHandler.middleware.js'
 export const registerValidator = () => [
     body("name", "Please enter name").notEmpty(),
     body("username", "Please enter username").notEmpty(),
     body("bio", "Please enter bio").notEmpty(),
     body("password", "Please enter passsword").notEmpty(),
-    check('avatar',).notEmpty().withMessage("Please upload you image")
 ]
 export const loginValidator = () => [
     body("username", "Please enter username").notEmpty(),
@@ -28,7 +27,6 @@ export const leaveGroupValidator = () => [
 ]
 export const sendAttachmentsValidator = () => [
     body("chatId", "Please provide Chat ID").notEmpty(),
-    check('files').notEmpty().withMessage("Please upload attachments").isArray({ min: 1, max: 5 }).withMessage("Attachments should be between 1-5"),
 ]
 export const getMessageValidator = () => [
     param("id", "Please provide Chat ID").notEmpty(),
