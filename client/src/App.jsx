@@ -16,21 +16,22 @@ const Dashboard=lazy(()=>import('./pages/admin/Dashboard.jsx'));
 const ChatManagement=lazy(()=>import('./pages/admin/ChatManagement.jsx'))
 const UserManagement=lazy(()=>import('./pages/admin/UserManagement.jsx'))
 const MessageManagement=lazy(()=>import('./pages/admin/MessageManagement.jsx'))
+import { Toaster } from "react-hot-toast";
 let user = true;
 function App() {
   const {user,isLoading}=useSelector(state=>state.auth)
   const dispatch=useDispatch()
-  useEffect(()=>{
-    const getMyProfile=async()=>{
-      const response=await fetch(`${server}/user/me`)
-      const data=await response.json()
-      if(!data.success)
-        dispatch(userNotExist())
+  // useEffect(()=>{
+  //   const getMyProfile=async()=>{
+  //     const response=await fetch(`${server}/user/me`)
+  //     const data=await response.json()
+  //     if(!data.success)
+  //       dispatch(userNotExist())
       
-    }
-    getMyProfile()
-  },[dispatch])
-  return isLoading?(<LayoutLoader/>):(
+  //   }
+  //   getMyProfile()
+  // },[dispatch])
+  return (
     <>
       <BrowserRouter>
         <Suspense fallback={<LayoutLoader/>}>
@@ -51,6 +52,7 @@ function App() {
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
+        <Toaster position='bottom-center'/>
       </BrowserRouter>
     </>
   )

@@ -13,19 +13,56 @@ import LoginIcon from "@mui/icons-material/Login";
 import HowToRegIcon from "@mui/icons-material/HowToReg";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import { VisuallyHiddenInput } from "../components/styles/StyledComponent";
-import {useFileHandler, useInputValidation,useStrongPassword} from "6pp"
+import { useFileHandler, useInputValidation, useStrongPassword } from "6pp"
 import { usernameValidator } from "../lib/validators.js";
+import { server } from '../constants/config.js';
+import { useDispatch } from "react-redux";
+import { userExist } from "../redux/reducers/auth.reducer.js";
+import toast from "react-hot-toast";
 function Login() {
   const [islogin, setIsLogin] = useState(true);
-  const name=useInputValidation("");
-  const bio=useInputValidation("");
-  const username=useInputValidation("",usernameValidator);
-  const password=useStrongPassword();
-  const avatar=useFileHandler("single");
-  const handleLogin=(e)=>{
+  // const [errorMessage,setErrorMessage]=useState("")
+  const name = useInputValidation("");
+  const bio = useInputValidation("");
+  const username = useInputValidation("", usernameValidator);
+  const password = useStrongPassword();
+  const avatar = useFileHandler("single");
+  const dispatch = useDispatch()
+  const handleLogin = (e) => {
     e.preventDefault();
-  }
-  const handleSignup=(e)=>{
+    const login = async () => {
+      try {
+        const loginResponse = await fetch(`${server}/user/login`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            username: username.value,
+            password: password.value
+          })
+        });
+
+        // if (!loginResponse.ok) {
+        //   throw new Error(`HTTP error! Status: ${loginResponse.status}`);
+        // }
+        const data = await loginResponse.json(); // Await the parsed JSON
+        console.log("Response:", loginResponse, "\nData:", data);
+        // dispatch(userExist(true))
+        // setErrorMessage(data.message)
+        if (!loginResponse.ok)
+          toast.error(data?.message || "Something went wrong")
+        else
+          toast.success(data.message)
+      } catch (err) {
+        console.log("Error message coming for login.jsx:", err);
+        // toast.error(error?.response?.data?.message || "Something went wrong")
+      }
+    };
+    login();
+  };
+
+  const handleSignup = (e) => {
     e.preventDefault();
 
   }
@@ -53,7 +90,7 @@ function Login() {
           {islogin ? (
             <>
               <Typography variant="h4">Login</Typography>
-              <form style={{ width: "100%", marginTop: "1rem" }}  onSubmit={handleLogin}>
+              <form style={{ width: "100%", marginTop: "1rem" }} onSubmit={handleLogin}>
                 <TextField
                   required
                   label="Username"
@@ -110,9 +147,9 @@ function Login() {
                     }}
                     src={avatar.preview}
                   />
-                  {avatar.error&&  <Typography color="error" variant="caption">{avatar.error}</Typography>}
+                  {avatar.error && <Typography color="error" variant="caption">{avatar.error}</Typography>}
                   <IconButton
-                    sx={{ position: "absolute", bottom: 0, right: 0,color:"white",bgcolor:"rgba(0,0,0,0.5)",":hover":{bgcolor:"rgba(0,0,0,0.7)"}}}
+                    sx={{ position: "absolute", bottom: 0, right: 0, color: "white", bgcolor: "rgba(0,0,0,0.5)", ":hover": { bgcolor: "rgba(0,0,0,0.7)" } }}
                     component="label"
                   >
                     <>
@@ -140,7 +177,7 @@ function Login() {
                   onChange={username.changeHandler}
                 />
                 {
-                  username.error &&   <Typography color="error" variant="caption">{username.error}</Typography>
+                  username.error && <Typography color="error" variant="caption">{username.error}</Typography>
                 }
                 <TextField
                   required
@@ -161,7 +198,7 @@ function Login() {
                   value={password.value}
                   onChange={password.changeHandler}
                 />
-                {password.error &&  <Typography color="error" variant="caption">{password.error}</Typography>}
+                {password.error && <Typography color="error" variant="caption">{password.error}</Typography>}
                 <Button
                   variant="text"
                   color="secondary"
