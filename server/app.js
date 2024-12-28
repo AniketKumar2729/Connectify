@@ -10,6 +10,7 @@ import { NEW_MESSAGE } from "./constants/event.constants.js";
 import { v4 as uuid } from "uuid"
 import { getSockets } from "./lib/helper.lib.js";
 import { Message } from "./models/message.model.js";
+import cors from 'cors'
 
 // import { createSampleGroupChat, createSampleMessage, createSampleMessageInAGroup, createSampleSingleChat, createUser } from "./seeders/users.seeders.js";
 connectDB()
@@ -76,6 +77,10 @@ app.use(express.json());
 //express.urlencoded() is used when we hit the endpoint with form data  from frontend
 // app.use(express.urlencoded());
 app.use(cookieParser())
+app.use(cors({
+    origin:["http://localhost:5173","http://localhost:4173",process.env.CLIENT_URL],
+    credentials:true
+}))
 app.use('/user', userRouter)
 app.use('/chat', chatRouter)
 app.use('/admin', adminRouter)
