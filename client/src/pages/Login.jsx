@@ -21,7 +21,6 @@ import { userExist } from "../redux/reducers/auth.reducer.js";
 import toast from "react-hot-toast";
 function Login() {
   const [islogin, setIsLogin] = useState(true);
-  // const [errorMessage,setErrorMessage]=useState("")
   const name = useInputValidation("");
   const bio = useInputValidation("");
   const username = useInputValidation("", usernameValidator);
@@ -43,13 +42,12 @@ function Login() {
           })
         });
 
-        // if (!loginResponse.ok) {
-        //   throw new Error(`HTTP error! Status: ${loginResponse.status}`);
-        // }
+        if (!loginResponse.ok) {
+          throw new Error(`HTTP error! Status: ${loginResponse.status}`);
+        }
         const data = await loginResponse.json(); // Await the parsed JSON
         console.log("Response:", loginResponse, "\nData:", data);
-        // dispatch(userExist(true))
-        // setErrorMessage(data.message)
+        dispatch(userExist(true))
         if (!loginResponse.ok)
           toast.error(data?.message || "Something went wrong")
         else
@@ -62,10 +60,67 @@ function Login() {
     login();
   };
 
+  // const handleSignup = (e) => {
+  //   e.preventDefault();
+  // const signup=async()=>{
+  //   try {
+  //     const signupResponse=await fetch(`${server}/api/user/v1/signup`,{
+  //       method:"POST",
+  //       headers:{
+  //        "Content-Type": "application/json"
+  //       },
+  //       body:JSON.stringify({
+  //         name:name.value,
+  //         username:username.value,
+  //         bio:bio.value,
+  //         password:password.value
+  //       })
+  //     })
+  //     const data= await signupResponse.json()
+  //     console.log("Response\t"+signupResponse+"Data\t"+data)
+  //   } catch (error) {
+  //     console.log(error)
+  //   }
+  // }
+  // signup()
+  // }
   const handleSignup = (e) => {
     e.preventDefault();
 
-  }
+    const signup = async () => {
+        try {
+            const signupResponse = await fetch(`${server}/api/user/v1/signup`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    name: name.value, // Ensure these are valid inputs or state variables
+                    username: username.value,
+                    bio: bio.value,
+                    password: password.value,
+                }),
+            });            
+            // Check for HTTP response status
+            if (!signupResponse.ok) {
+                throw new Error(`Signup failed with status: ${signupResponse.status} ${signupResponse.statusText}`);
+            }
+
+            // Parse response JSON
+            const data = await signupResponse.json();
+            console.log("Response:", signupResponse);
+            console.log("Data:", data);
+            // dispatch(userExist(true))
+            toast.success(data.message)
+        } catch (error) {
+            console.error("Error during signup:", error.message);
+            toast.error(error?.response?.data?.message||"Something went wrong")
+        }
+    };
+
+    signup();
+};
+
   return (
     <>
       <Container

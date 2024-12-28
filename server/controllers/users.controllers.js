@@ -24,10 +24,13 @@ export const newUser = TryCatch(async (req, res,next) => {
 )
 export const login = TryCatch(async (req, res, next) => {
     const { username, password } = req.body;
-    const existedUser = await User.findOne({ username }).select("+password"); //.select is used because in our model we separated the password and then send the response due to select() we can get password also
+    const existedUser = await User.findOne({ username }).select("+password"); //.select is used because in our model we separated the password and then send the response due to select() we can get password also    
+    if(existedUser===null)
+        return next(errorHandler(404,"Invalid Credentials"))
     const isPasswordMatch = await compare(password, existedUser.password);
     if (!isPasswordMatch)
         return next(errorHandler(401, "Invalid password"))
+   
     // return res.status(400).json({message:"Invalid password"})
     // else if (!(username === existedUser.username))
     //     return next(new Error('Invalid username'))
