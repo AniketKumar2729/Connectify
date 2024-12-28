@@ -1,7 +1,10 @@
-import React, { lazy, Suspense } from 'react'
+import React, { lazy, Suspense, useEffect } from 'react'
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ProtectedRoute from './components/auth/ProtectedRoute.jsx';
 import { LayoutLoader } from './components/layout/Loaders.jsx';
+import { server } from './constants/config.js';
+import { useDispatch, useSelector } from 'react-redux';
+import { userNotExist } from './redux/reducers/auth.reducer.js';
 const Home = lazy(() => import("./pages/Home.jsx"));
 const Login = lazy(() => import("./pages/Login.jsx"));
 const Chat = lazy(() => import("./pages/Chat.jsx"));
@@ -15,7 +18,19 @@ const UserManagement=lazy(()=>import('./pages/admin/UserManagement.jsx'))
 const MessageManagement=lazy(()=>import('./pages/admin/MessageManagement.jsx'))
 let user = true;
 function App() {
-  return (
+  const {user,isLoading}=useSelector(state=>state.auth)
+  const dispatch=useDispatch()
+  useEffect(()=>{
+    const getMyProfile=async()=>{
+      const response=await fetch(`${server}/user/me`)
+      const data=await response.json()
+      if(!data.success)
+        dispatch(userNotExist())
+      
+    }
+    getMyProfile()
+  },[dispatch])
+  return isLoading?(<LayoutLoader/>):(
     <>
       <BrowserRouter>
         <Suspense fallback={<LayoutLoader/>}>
