@@ -7,13 +7,13 @@ import { Request } from "../models/request.model.js";
 import { NEW_REQUEST, REFETCH_CHATS } from "../constants/event.constants.js";
 import { getOtherMember } from "../lib/helper.lib.js";
 //create new user and save it to database and return cookie
-export const newUser = TryCatch(async (req, res,next) => {
-    const file = req.file;    
-    console.log(file);    
+export const newUser = TryCatch(async (req, res, next) => {
+    const file = req.file;
+    console.log(file);
     if (!file) return next(errorHandler(400, "Please upload Image"))
-    const resultCameFromCloudinary= await uploadFileIntoCloudinary([file])
+    const resultCameFromCloudinary = await uploadFileIntoCloudinary([file])
     if (!resultCameFromCloudinary || resultCameFromCloudinary.length === 0) {
-        console.log("coming form user.controller.js file","Image upload failed");
+        console.log("coming form user.controller.js file", "Image upload failed");
         return next(errorHandler(500, "Image upload failed"));
     }
     const avatar = {
@@ -28,18 +28,19 @@ export const newUser = TryCatch(async (req, res,next) => {
 export const login = TryCatch(async (req, res, next) => {
     const { username, password } = req.body;
     const existedUser = await User.findOne({ username }).select("+password"); //.select is used because in our model we separated the password and then send the response due to select() we can get password also    
-    if(existedUser===null)
-        return next(errorHandler(404,"Invalid Username"))
+    if (existedUser === null)
+        return next(errorHandler(404, "Invalid Username"))
     const isPasswordMatch = await compare(password, existedUser.password);
     if (!isPasswordMatch)
         return next(errorHandler(401, "Invalid password"))
-   
+    // Exclude password from response
+    const { password: _, ...safeUserData } = existedUser.toObject();
     // return res.status(400).json({message:"Invalid password"})
     // else if (!(username === existedUser.username))
     //     return next(new Error('Invalid username'))
     // return res.status(400).json({message:"Invalid username"})
     //    const {password:pass,...rest}=existedUser._doc; //this is how we separate the password from the rest of the field
-    sendToken(res, existedUser, 200, `Welcome back,${existedUser.name}`);
+    sendToken(res, safeUserData, 200, `Welcome back,${safeUserData.name}`);
 })
 export const getMyProfile = TryCatch(async (req, res) => {
     const verifiedUser = await User.findById(req.userId).select("-password")

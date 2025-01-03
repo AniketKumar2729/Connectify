@@ -6,7 +6,7 @@ import { singleAvatar } from "../middlewares/multer.middleware.js";
 
 
 const userRouter = express.Router();
-userRouter.post('/signup',singleAvatar,registerValidator(),validateHandler,newUser)
+userRouter.post('/signup',registerValidator(),validateHandler,singleAvatar,newUser)
 userRouter.post('/login', loginValidator(),validateHandler,login)
 //After here user must be logged in to access the route
 userRouter.get('/me',isAuthenticated,getMyProfile)

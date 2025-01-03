@@ -14,10 +14,12 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import Diversity3Icon from "@mui/icons-material/Diversity3";
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import { blue } from "../../constants/color.js";
-
+import toast from "react-hot-toast";
 import React, { lazy, Suspense, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import {server} from '../../constants/config.js'
+import {userNotExist} from "../../redux/reducers/auth.reducer.js"
+import { useDispatch } from "react-redux";
 let Search =lazy(()=>import("../specific/Search.jsx"));
 let Notification=lazy(()=>import("../specific/Notification.jsx"))
 let NewGroup=lazy(()=>import("../specific/NewGroup.jsx"))
@@ -28,6 +30,7 @@ const Header = () => {
   let [search,setSearch]=useState(false);
   let [group,setGroup]=useState(false);
   let [notification,setNotification]=useState(false);
+  const dispatch = useDispatch()
   const handleMobile = () => {
     console.log("Mobile");
     
@@ -42,6 +45,22 @@ const Header = () => {
     navigate("/group");
   };
   const handleLogout = () => {
+    const logout=async()=>{
+      try {
+        const logoutResponse=await fetch(`${server}/api/v1/user/logout`,{
+          credentials:'include'
+        })
+        if(logoutResponse.ok){
+          const data=await logoutResponse.json()
+          dispatch(userNotExist())
+          console.log("Logout console.log","Data\t",data);
+          toast.success(data.message)
+        }
+      } catch (error) {
+         toast.error(error?.response?.data?.message || "Something went wrong")
+      }
+    }
+    logout()
    console.log("Logout");
    
   };

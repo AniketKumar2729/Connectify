@@ -13,7 +13,7 @@ import LoginIcon from "@mui/icons-material/Login";
 import HowToRegIcon from "@mui/icons-material/HowToReg";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import { VisuallyHiddenInput } from "../components/styles/StyledComponent";
-import { useFileHandler, useInputValidation, useStrongPassword } from "6pp"
+import { useFileHandler, useInputValidation, useStrongPassword} from "6pp"
 import { usernameValidator } from "../lib/validators.js";
 import { server } from '../constants/config.js';
 import { useDispatch } from "react-redux";
@@ -33,6 +33,7 @@ function Login() {
       try {
         const loginResponse = await fetch(`${server}/api/v1/user/login`, {
           method: "POST",
+          credentials: 'include',
           headers: {
             "Content-Type": "application/json"
           },
@@ -48,7 +49,7 @@ function Login() {
           toast.error(data?.message || "Something went wrong")
 
         } else {
-          // dispatch(userExist(true))
+          dispatch(userExist(data.user))
           toast.success(data.message)
         }
         // if (!loginResponse.ok)
@@ -119,7 +120,6 @@ function Login() {
     };
     signup();
   };
-
   return (
     <>
       <Container
@@ -201,7 +201,9 @@ function Login() {
                     }}
                     src={avatar.preview}
                   />
-                  {avatar.error && <Typography color="error" variant="caption">{avatar.error}</Typography>}
+                  {
+                    avatar.error && <Typography color="error" variant="caption">{avatar.error}</Typography>
+                  }
                   <IconButton
                     sx={{ position: "absolute", bottom: 0, right: 0, color: "white", bgcolor: "rgba(0,0,0,0.5)", ":hover": { bgcolor: "rgba(0,0,0,0.7)" } }}
                     component="label"
