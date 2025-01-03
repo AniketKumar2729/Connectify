@@ -31,7 +31,7 @@ function Login() {
     e.preventDefault();
     const login = async () => {
       try {
-        const loginResponse = await fetch(`${server}/user/login`, {
+        const loginResponse = await fetch(`${server}/api/v1/user/login`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
@@ -41,17 +41,19 @@ function Login() {
             password: password.value
           })
         });
-
-        if (!loginResponse.ok) {
-          throw new Error(`HTTP error! Status: ${loginResponse.status}`);
-        }
         const data = await loginResponse.json(); // Await the parsed JSON
         console.log("Response:", loginResponse, "\nData:", data);
-        dispatch(userExist(true))
-        if (!loginResponse.ok)
+        if (!loginResponse.ok) {
+          // throw new Error(`HTTP error! Status: ${loginResponse.status}`);
           toast.error(data?.message || "Something went wrong")
-        else
+
+        } else {
+          // dispatch(userExist(true))
           toast.success(data.message)
+        }
+        // if (!loginResponse.ok)
+        //   toast.error(data?.message || "Something went wrong")
+        // else
       } catch (err) {
         console.log("Error message coming for login.jsx:", err);
         // toast.error(error?.response?.data?.message || "Something went wrong")
@@ -86,40 +88,37 @@ function Login() {
   // }
   const handleSignup = (e) => {
     e.preventDefault();
-
     const signup = async () => {
-        try {
-            const signupResponse = await fetch(`${server}/api/user/v1/signup`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    name: name.value, // Ensure these are valid inputs or state variables
-                    username: username.value,
-                    bio: bio.value,
-                    password: password.value,
-                }),
-            });            
-            // Check for HTTP response status
-            if (!signupResponse.ok) {
-                throw new Error(`Signup failed with status: ${signupResponse.status} ${signupResponse.statusText}`);
-            }
-
-            // Parse response JSON
-            const data = await signupResponse.json();
-            console.log("Response:", signupResponse);
-            console.log("Data:", data);
-            // dispatch(userExist(true))
-            toast.success(data.message)
-        } catch (error) {
-            console.error("Error during signup:", error.message);
-            toast.error(error?.response?.data?.message||"Something went wrong")
+      try {
+        const formData = new FormData();
+        formData.append("name", name.value);
+        formData.append("username", username.value);
+        formData.append("bio", bio.value);
+        formData.append("password", password.value);
+        if (avatar.file) {
+          formData.append("avatar", avatar.file); // Attach the avatar file
         }
+        const signupResponse = await fetch(`${server}/api/v1/user/signup`, {
+          method: "POST",
+          body: formData, // Send FormData
+        });
+        // Parse response JSON
+        const data = await signupResponse.json();
+        // console.log("Response:->", signupResponse);
+        // console.log("Data:->", data);
+        if (!signupResponse.ok) {
+          toast.error(data?.message)
+        } else {
+          toast.success(data?.message)
+          // dispatch(userExist(true))
+        }
+      } catch (error) {
+        console.error("Error during signup:", error.message);
+        toast.error(error?.response?.data?.message || "Something went wrong")
+      }
     };
-
     signup();
-};
+  };
 
   return (
     <>

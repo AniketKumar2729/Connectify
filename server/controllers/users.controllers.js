@@ -2,21 +2,24 @@ import { compare } from "bcrypt";
 import { errorHandler, TryCatch } from "../middlewares/errorHandler.middleware.js";
 import { User } from "../models/user.model.js";
 import { Chat } from "../models/chat.model.js";
-import { cookieOption, emitEvent, sendToken } from "../utils/features.utils.js";
+import { cookieOption, emitEvent, sendToken, uploadFileIntoCloudinary } from "../utils/features.utils.js";
 import { Request } from "../models/request.model.js";
 import { NEW_REQUEST, REFETCH_CHATS } from "../constants/event.constants.js";
 import { getOtherMember } from "../lib/helper.lib.js";
 //create new user and save it to database and return cookie
 export const newUser = TryCatch(async (req, res,next) => {
-    // console.log(req.body);
-    //this is static data and it will store in database
-    const avatar = {
-        public_id: 'akhsdjk',
-        url: "sfjkhdfjkhdsjhk"
+    const file = req.file;    
+    console.log(file);    
+    if (!file) return next(errorHandler(400, "Please upload Image"))
+    const resultCameFromCloudinary= await uploadFileIntoCloudinary([file])
+    if (!resultCameFromCloudinary || resultCameFromCloudinary.length === 0) {
+        console.log("coming form user.controller.js file","Image upload failed");
+        return next(errorHandler(500, "Image upload failed"));
     }
-    // await User.create({name:"Aniket",username:"aniket2729",password:"123456",avatar})
-    // const file = req.file;
-    // if (!file) return next(errorHandler(400, "Please upload Image"))
+    const avatar = {
+        public_id: resultCameFromCloudinary[0].public_id,
+        url: resultCameFromCloudinary[0].url
+    }
     const { name, username, password, bio } = req.body;
     const newUser = await User.create({ name, username, password, bio, avatar })
     sendToken(res, newUser, 201, "User Created");
@@ -26,7 +29,7 @@ export const login = TryCatch(async (req, res, next) => {
     const { username, password } = req.body;
     const existedUser = await User.findOne({ username }).select("+password"); //.select is used because in our model we separated the password and then send the response due to select() we can get password also    
     if(existedUser===null)
-        return next(errorHandler(404,"Invalid Credentials"))
+        return next(errorHandler(404,"Invalid Username"))
     const isPasswordMatch = await compare(password, existedUser.password);
     if (!isPasswordMatch)
         return next(errorHandler(401, "Invalid password"))

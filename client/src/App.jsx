@@ -17,13 +17,13 @@ const ChatManagement=lazy(()=>import('./pages/admin/ChatManagement.jsx'))
 const UserManagement=lazy(()=>import('./pages/admin/UserManagement.jsx'))
 const MessageManagement=lazy(()=>import('./pages/admin/MessageManagement.jsx'))
 import { Toaster } from "react-hot-toast";
-let user = true;
+// let user = true;
 function App() {
   const {user,isLoading}=useSelector(state=>state.auth)
   const dispatch=useDispatch()
   // useEffect(()=>{
   //   const getMyProfile=async()=>{
-  //     const response=await fetch(`${server}/user/me`)
+  //     const response=await fetch(`${server}/api/v1/user/me`)
   //     const data=await response.json()
   //     if(!data.success)
   //       dispatch(userNotExist())

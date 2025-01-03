@@ -11,9 +11,15 @@ import { v4 as uuid } from "uuid"
 import { getSockets } from "./lib/helper.lib.js";
 import { Message } from "./models/message.model.js";
 import cors from 'cors'
+import {v2 as cloudinary} from 'cloudinary'
 
 // import { createSampleGroupChat, createSampleMessage, createSampleMessageInAGroup, createSampleSingleChat, createUser } from "./seeders/users.seeders.js";
 connectDB()
+cloudinary.config({
+    cloud_name:process.env.CLOUDINARY_CLOUD_NAME,
+    api_key:process.env.CLOUDINARY_API_KEY,
+    api_secret:process.env.CLOUDINARY_API_SECRET
+})
 const app = express();
 export const userSocketIDs=new Map()
 const server = createServer(app)
@@ -81,9 +87,9 @@ app.use(cors({
     origin:["http://localhost:5173","http://localhost:4173",process.env.CLIENT_URL],
     credentials:true
 }))
-app.use('/api/user', userRouter)
-app.use('/chat', chatRouter)
-app.use('/admin', adminRouter)
+app.use('/api/v1/user', userRouter)
+app.use('/api/v1/chat', chatRouter)
+app.use('/api/v1/admin', adminRouter)
 app.get('/', (req, res) => {
     res.send("hello user")
 })
