@@ -20,20 +20,20 @@ import { useNavigate } from "react-router-dom";
 import {server} from '../../constants/config.js'
 import {userNotExist} from "../../redux/reducers/auth.reducer.js"
 import { useDispatch } from "react-redux";
+import { setIsMobileMenu } from "../../redux/reducers/miscellaneous.reducers.js";
 let Search =lazy(()=>import("../specific/Search.jsx"));
 let Notification=lazy(()=>import("../specific/Notification.jsx"))
 let NewGroup=lazy(()=>import("../specific/NewGroup.jsx"))
 
 const Header = () => {
   const navigate = useNavigate();
-  let [mobile,setMobile]=useState(false);
   let [search,setSearch]=useState(false);
   let [group,setGroup]=useState(false);
   let [notification,setNotification]=useState(false);
   const dispatch = useDispatch()
   const handleMobile = () => {
-    console.log("Mobile");
-    
+    dispatch(setIsMobileMenu(true))
+    console.log("Mobile");    
   };
   const openSearchDialog = () => {
    setSearch(prev=>!prev)
