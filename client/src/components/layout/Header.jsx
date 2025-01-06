@@ -17,63 +17,62 @@ import { blue } from "../../constants/color.js";
 import toast from "react-hot-toast";
 import React, { lazy, Suspense, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {server} from '../../constants/config.js'
-import {userNotExist} from "../../redux/reducers/auth.reducer.js"
-import { useDispatch } from "react-redux";
-import { setIsMobileMenu } from "../../redux/reducers/miscellaneous.reducers.js";
-let Search =lazy(()=>import("../specific/Search.jsx"));
-let Notification=lazy(()=>import("../specific/Notification.jsx"))
-let NewGroup=lazy(()=>import("../specific/NewGroup.jsx"))
+import { server } from '../../constants/config.js'
+import { userNotExist } from "../../redux/reducers/auth.reducer.js"
+import { useDispatch, useSelector } from "react-redux";
+import { setIsMobileMenu, setIsSearch } from "../../redux/reducers/miscellaneous.reducers.js";
+let Search = lazy(() => import("../specific/Search.jsx"));
+let Notification = lazy(() => import("../specific/Notification.jsx"))
+let NewGroup = lazy(() => import("../specific/NewGroup.jsx"))
 
 const Header = () => {
   const navigate = useNavigate();
-  let [search,setSearch]=useState(false);
-  let [group,setGroup]=useState(false);
-  let [notification,setNotification]=useState(false);
+  let [group, setGroup] = useState(false);
+  let [notification, setNotification] = useState(false);
   const dispatch = useDispatch()
+  const { isSearch } = useSelector((state) => state.misc)
   const handleMobile = () => {
     dispatch(setIsMobileMenu(true))
-    console.log("Mobile");    
   };
   const openSearchDialog = () => {
-   setSearch(prev=>!prev)
+    dispatch(setIsSearch(true))
   };
   const openNewGroup = () => {
-    setGroup(prev=>!prev)
+    setGroup(prev => !prev)
   };
   const navigateToGroup = () => {
     navigate("/group");
   };
   const handleLogout = () => {
-    const logout=async()=>{
+    const logout = async () => {
       try {
-        const logoutResponse=await fetch(`${server}/api/v1/user/logout`,{
-          credentials:'include'
+        const logoutResponse = await fetch(`${server}/api/v1/user/logout`, {
+          credentials: 'include'
         })
-        if(logoutResponse.ok){
-          const data=await logoutResponse.json()
+        if (logoutResponse.ok) {
+          const data = await logoutResponse.json()
           dispatch(userNotExist())
-          console.log("Logout console.log","Data\t",data);
+          console.log("Logout console.log", "Data\t", data);
           toast.success(data.message)
         }
       } catch (error) {
-         toast.error(error?.response?.data?.message || "Something went wrong")
+        toast.error(error?.response?.data?.message || "Something went wrong")
       }
     }
     logout()
-   console.log("Logout");
-   
+    console.log("Logout");
+
   };
   const openNotification = () => {
-   setNotification(prev=>!prev)
-   
+    setNotification(prev => !prev)
+
   };
   return (
     <>
       <Box sx={{ flexGrow: 1 }} height={"4rem"}>
-        <AppBar position="static" sx={{ bgcolor:blue}}>
+        <AppBar position="static" sx={{ bgcolor: blue }}>
           <Toolbar>
-          {/* rightpart of header */}
+            {/* rightpart of header */}
             <Typography
               variant="h6"
               sx={{ display: { xs: "none", sm: "block" } }}
@@ -127,13 +126,13 @@ const Header = () => {
         </AppBar>
       </Box>
       {
-        search&&(<Suspense fallback={<Backdrop open/>}><Search/></Suspense>)
+        isSearch && (<Suspense fallback={<Backdrop open />}><Search /></Suspense>)
       }
       {
-        group&&(<Suspense fallback={<Backdrop open/>}><NewGroup/></Suspense>)
+        group && (<Suspense fallback={<Backdrop open />}><NewGroup /></Suspense>)
       }
       {
-        notification&&(<Suspense fallback={<Backdrop open/>}><Notification/></Suspense>)
+        notification && (<Suspense fallback={<Backdrop open />}><Notification /></Suspense>)
       }
     </>
   );

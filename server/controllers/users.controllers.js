@@ -9,7 +9,6 @@ import { getOtherMember } from "../lib/helper.lib.js";
 //create new user and save it to database and return cookie
 export const newUser = TryCatch(async (req, res, next) => {
     const file = req.file;
-    console.log(file);
     if (!file) return next(errorHandler(400, "Please upload Image"))
     const resultCameFromCloudinary = await uploadFileIntoCloudinary([file])
     if (!resultCameFromCloudinary || resultCameFromCloudinary.length === 0) {
