@@ -42,7 +42,7 @@ export const deleteChatValidator = () => [
     param("id", "Please provide Chat ID").notEmpty(),
 ]
 export const friendRequestValidator = () => [
-    body("receiverId", "Please provide receiver ID").notEmpty(),
+    body("receiverId", "Please provide an valid ID").notEmpty(),
 ]
 export const friendRequestAcceptValidator = () => [
     body("accept").notEmpty().withMessage("Please add accept").isBoolean().withMessage("Accept must be Yes or No"),
