@@ -8,8 +8,9 @@ import { NEW_REQUEST, REFETCH_CHATS } from "../constants/event.constants.js";
 import { getOtherMember } from "../lib/helper.lib.js";
 //create new user and save it to database and return cookie
 export const newUser = TryCatch(async (req, res, next) => {
-    const file = req.file;
-    if (!file) return next(errorHandler(400, "Please upload Image"))
+    const { name, username, password, bio } = req.body;
+    const file = req.file;    
+    if (!file) return next(errorHandler(400, "Please upload an image with the field name 'avatar' "))
     const resultCameFromCloudinary = await uploadFileIntoCloudinary([file])
     if (!resultCameFromCloudinary || resultCameFromCloudinary.length === 0) {
         console.log("coming form user.controller.js file", "Image upload failed");
@@ -19,7 +20,6 @@ export const newUser = TryCatch(async (req, res, next) => {
         public_id: resultCameFromCloudinary[0].public_id,
         url: resultCameFromCloudinary[0].url
     }
-    const { name, username, password, bio } = req.body;
     const newUser = await User.create({ name, username, password, bio, avatar })
     sendToken(res, newUser, 201, "User Created");
 }

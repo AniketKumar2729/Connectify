@@ -4,9 +4,11 @@ import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import TagFacesIcon from '@mui/icons-material/TagFaces';
 import AlternateEmailOutlinedIcon from '@mui/icons-material/AlternateEmailOutlined';
 import moment from 'moment';
+import { useSelector } from "react-redux";
 
 
 const Profile = () => {
+  const {user}=useSelector(state=>state.auth)
   return (
     <Stack spacing={"2rem"} direction={"column"} alignItems={"center"}>
     {/* profilePic=false */}
@@ -14,11 +16,11 @@ const Profile = () => {
         A
       </Avatar> */}
       {/* profilePic=true */}
-      <Avatar sx={{width:200,height:200,objectFit:'contain',marginBottom:'1rem',border:'5px solid white'}}/>
-      <ProfileCard heading={"PCB PCM "} text={"dfklsjdfslkdfj"} />
-      <ProfileCard heading={"Arts Commerce "} text={"dfnldfsnkldsf"} Icon={<TagFacesIcon/>} />
-      <ProfileCard heading={"Btech Bcom BBA BA "} text={"dfklsjdfslkdfj"}  Icon={<AlternateEmailOutlinedIcon/>} />
-      <ProfileCard heading={"Btech Bcom BBA BA "} text={moment('2024-10-11T00:00:00.000Z').fromNow()}  Icon={<CalendarMonthIcon/>} />
+      <Avatar src={user?.avatar?.url} sx={{width:200,height:200,objectFit:'contain',marginBottom:'1rem',border:'5px solid white'}}/>
+      <ProfileCard heading={"Bio"} text={user.bio||"Not Availabe"} />
+      <ProfileCard heading={"Name"} text={user.name||"Not Availabe"} Icon={<TagFacesIcon/>} />
+      <ProfileCard heading={"Username"} text={user.username}  Icon={<AlternateEmailOutlinedIcon/>} />
+      <ProfileCard heading={"Joined"} text={moment(user.createAt).fromNow()}  Icon={<CalendarMonthIcon/>} />
     </Stack>
   );
 };

@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import { useInputValidation } from "6pp";
+import SearchIcon from "@mui/icons-material/Search";
 import {
   Dialog,
   DialogTitle,
@@ -7,15 +8,12 @@ import {
   Stack,
   TextField,
 } from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
-import { useInputValidation } from "6pp";
-import UserItem from "../shared/UserItem";
-import { sampleUser } from "../../constants/sampleData.js";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setIsSearch } from "../../redux/reducers/miscellaneous.reducers.js";
-import { useLazySearchUserQuery, useSendFriendRequestMutation } from "../../redux/api/api.js";
-import toast from "react-hot-toast";
 import { useAsyncMutation } from "../../hooks/hook.jsx";
+import { useLazySearchUserQuery, useSendFriendRequestMutation } from "../../redux/api/api.js";
+import { setIsSearch } from "../../redux/reducers/miscellaneous.reducers.js";
+import UserItem from "../shared/UserItem";
 const Search = () => {
   const [users, setUsers] = useState([]);
   const search = useInputValidation("");

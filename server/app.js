@@ -79,7 +79,8 @@ server.listen(3000, () => {
 
 //using middleware
 //express.json() is used when we hit the endpoint with thunder client we  type json in body
-app.use(express.json());
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ limit: "10mb", extended: true }));
 //express.urlencoded() is used when we hit the endpoint with form data  from frontend
 // app.use(express.urlencoded());
 app.use(cookieParser())

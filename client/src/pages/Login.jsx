@@ -13,7 +13,7 @@ import LoginIcon from "@mui/icons-material/Login";
 import HowToRegIcon from "@mui/icons-material/HowToReg";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import { VisuallyHiddenInput } from "../components/styles/StyledComponent";
-import { useFileHandler, useInputValidation, useStrongPassword} from "6pp"
+import { useFileHandler, useInputValidation, useStrongPassword } from "6pp"
 import { usernameValidator } from "../lib/validators.js";
 import { server } from '../constants/config.js';
 import { useDispatch } from "react-redux";
@@ -26,6 +26,7 @@ function Login() {
   const username = useInputValidation("", usernameValidator);
   const password = useStrongPassword();
   const avatar = useFileHandler("single");
+  // console.log(avatar);
   const dispatch = useDispatch()
   const handleLogin = (e) => {
     e.preventDefault();
@@ -62,46 +63,49 @@ function Login() {
     };
     login();
   };
-
   // const handleSignup = (e) => {
   //   e.preventDefault();
-  // const signup=async()=>{
-  //   try {
-  //     const signupResponse=await fetch(`${server}/api/user/v1/signup`,{
-  //       method:"POST",
-  //       headers:{
-  //        "Content-Type": "application/json"
-  //       },
-  //       body:JSON.stringify({
-  //         name:name.value,
-  //         username:username.value,
-  //         bio:bio.value,
-  //         password:password.value
+  //   const signup = async () => {
+  //     try {
+  //       const signupResponse = await fetch(`${server}/api/v1/user/signup`, {
+  //         method: "POST",
+  //         credentials: "include",
+  //         headers: {
+  //           "Content-Type": "application/json"
+  //         },
+  //         body: JSON.stringify({
+  //           name: name.value,
+  //           username: username.value,
+  //           bio: bio.value,
+  //           password: password.value
+  //         })
   //       })
-  //     })
-  //     const data= await signupResponse.json()
-  //     console.log("Response\t"+signupResponse+"Data\t"+data)
-  //   } catch (error) {
-  //     console.log(error)
+  //       const data = await signupResponse.json()
+  //       console.log("Response\t" + signupResponse + "Data\t" + data)
+  //     } catch (error) {
+  //       console.log(error)
+  //     }
   //   }
+  //   signup()
   // }
-  // signup()
-  // }
+  
   const handleSignup = (e) => {
     e.preventDefault();
     const signup = async () => {
       try {
-        const formData = new FormData();
-        formData.append("name", name.value);
-        formData.append("username", username.value);
-        formData.append("bio", bio.value);
-        formData.append("password", password.value);
-        if (avatar.file) {
-          formData.append("avatar", avatar.file); // Attach the avatar file
-        }
         const signupResponse = await fetch(`${server}/api/v1/user/signup`, {
           method: "POST",
-          body: formData, // Send FormData
+          credentials: 'include',
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            name: name.value,
+            username: username.value,
+            bio: bio.value,
+            password: password.value,
+            avatar:avatar
+          })
         });
         // Parse response JSON
         const data = await signupResponse.json();
@@ -286,3 +290,5 @@ function Login() {
 }
 
 export default Login;
+
+
