@@ -16,9 +16,9 @@ const AppLayout = () => (WrappedComponent) => {
     const params=useParams();
     const chatId=params.chatId
     const{isMobileMenu}=useSelector((state)=>state.misc)
+    const {user}=useSelector(state=>state.auth)
     const dispatch=useDispatch()
-    const {isLoading,data,isError,error,refetch}=useMyChatsQuery("")
-    // console.log(data);  
+    const {isLoading,data,isError,error,refetch}=useMyChatsQuery("")  
     useErrors([{isError,error}]) 
     const handleDeleteChat=(e,_id,groupChat)=>{
       e.preventDefault();
