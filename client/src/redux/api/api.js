@@ -12,6 +12,13 @@ const api=createApi({
             }),
             providesTags:["Chat"],
         }),
+        oneToOne:builder.query({
+            query:()=>({
+                url:"/chat/oneToOneChat",
+                credentials:"include"
+            }),
+            providesTags:["Chat"],
+        }),
         searchUser:builder.query({
             query:(name)=>({
                 url:`/user/search?name=${name}`,
@@ -47,4 +54,4 @@ const api=createApi({
     })
 })
 export default api;
-export const {useMyChatsQuery,useLazySearchUserQuery,useSendFriendRequestMutation,useGetNotificationQuery,useAcceptFriendRequestMutation}=api
+export const {useMyChatsQuery,useLazySearchUserQuery,useSendFriendRequestMutation,useGetNotificationQuery,useAcceptFriendRequestMutation,useOneToOneQuery}=api

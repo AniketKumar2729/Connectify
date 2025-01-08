@@ -30,7 +30,7 @@ const Notification = () => {
         console.log("Use Socket here",res.data.success);
         toast.success(res.data?.message)
       } else {
-        toast.error(res.data?.message || "Something went wrong")
+        toast.error(res.data?.error || "Something went wrong")
       }
     } catch (error) {
       console.log(error);

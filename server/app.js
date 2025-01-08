@@ -12,6 +12,7 @@ import { getSockets } from "./lib/helper.lib.js";
 import { Message } from "./models/message.model.js";
 import cors from 'cors'
 import {v2 as cloudinary} from 'cloudinary'
+import { corsOptions } from "./constants/config.constant.js";
 
 // import { createSampleGroupChat, createSampleMessage, createSampleMessageInAGroup, createSampleSingleChat, createUser } from "./seeders/users.seeders.js";
 connectDB()
@@ -23,7 +24,10 @@ cloudinary.config({
 const app = express();
 export const userSocketIDs=new Map()
 const server = createServer(app)
-const io = new Server(server, {})
+const io = new Server(server, {
+    cors:
+        corsOptions
+})
 io.on("connection", (socket) => {
     const tempUser = {
         _id: 'abcd',
@@ -57,7 +61,7 @@ io.on("connection", (socket) => {
             chatId
         })      
         try {
-            await Message.create9(messageForDB)
+            await Message.create(messageForDB)
         } catch (error) {
             console.log(error);
             
@@ -84,10 +88,7 @@ app.use(express.urlencoded({ limit: "10mb", extended: true }));
 //express.urlencoded() is used when we hit the endpoint with form data  from frontend
 // app.use(express.urlencoded());
 app.use(cookieParser())
-app.use(cors({
-    origin:["http://localhost:5173","http://localhost:4173",process.env.CLIENT_URL],
-    credentials:true
-}))
+app.use(cors(corsOptions))
 app.use('/api/v1/user', userRouter)
 app.use('/api/v1/chat', chatRouter)
 app.use('/api/v1/admin', adminRouter)

@@ -10,15 +10,19 @@ import { useMyChatsQuery } from "../../redux/api/api.js";
 import { useDispatch, useSelector } from "react-redux";
 import { setIsMobileMenu } from "../../redux/reducers/miscellaneous.reducers.js";
 import { useErrors } from "../../hooks/hook.jsx";
+import { getSocket } from "../../Socket.jsx";
 
 const AppLayout = () => (WrappedComponent) => {
   return (props) => {
     const params=useParams();
     const chatId=params.chatId
+    const socket=getSocket() 
+    console.log(socket);
+    
     const{isMobileMenu}=useSelector((state)=>state.misc)
     const {user}=useSelector(state=>state.auth)
     const dispatch=useDispatch()
-    const {isLoading,data,isError,error,refetch}=useMyChatsQuery("")  
+    const {isLoading,data,isError,error,refetch}=useMyChatsQuery("")    
     useErrors([{isError,error}]) 
     const handleDeleteChat=(e,_id,groupChat)=>{
       e.preventDefault();

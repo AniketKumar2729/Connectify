@@ -33,7 +33,7 @@ const getMyChats = TryCatch(async (req, res, next) => {
             avatar: groupChat ? members.slice(0, 3).map(({ avatar }) => avatar.url) : [otherMember.avatar.url],
             name: groupChat ? name : otherMember.name,
             members: members.reduce((prev, curr) => {
-                if (curr._id !== req.userId)
+                if (curr._id.toString() !== req.userId.toString())
                     prev.push(curr._id)
                 return prev
             }, [])
@@ -42,6 +42,47 @@ const getMyChats = TryCatch(async (req, res, next) => {
     return res.status(200).json({
         success: true,
         chats: transFormedChats
+    })
+})
+const oneToOneChat = TryCatch(async (req, res, next) => {
+    const chats = await Chat.find({
+        $and: [
+            { members: { $size: 2 } },
+            { members: req.userId }
+        ]
+    }).populate("members", "name avatar");
+    let tranformedMember = {
+        sender: {
+            avatar: '',
+            name: '',
+            id:''
+        },
+        receiver: {
+            avatar: '',
+            name: '',
+            id:''
+        }
+    }
+    chats[0].members.map((chat, idx) => {
+        if (chat._id.toString() === req.userId.toString()) {
+            tranformedMember.sender = {
+                avatar: chat.avatar.url,
+                name: chat.name,
+                id:chat._id
+            }
+        } else {
+            tranformedMember.receiver = {
+                avatar: chat.avatar.url,
+                name: chat.name,
+                id:chat._id
+            }
+        }
+    })
+
+    return res.status(200).json({
+        success: true,
+        message: 'api working well',
+        tranformedMember
     })
 })
 
@@ -135,8 +176,8 @@ const sendAttachments = TryCatch(async (req, res, next) => {
     const files = req.files || [];
     if (files.length < 1)
         return next(errorHandler(400, "Please upload attachments"))
-    if(files.length>5)
-        return next(errorHandler(400,"Files can' be more than 5"))
+    if (files.length > 5)
+        return next(errorHandler(400, "Files can' be more than 5"))
     const [verifiedChat, verifiedUser] = await Promise.all([Chat.findById(chatId), User.findById(req.userId, 'name')])
     console.log(verifiedChat, verifiedUser)
     if (!verifiedChat)
@@ -242,4 +283,4 @@ const getMessages = TryCatch(async (req, res, next) => {
 
 
 })
-export { newGroupChat, getMyChats, getMyGroups, addMembers, removeMembers, leaveGroup, sendAttachments, getGroupDetails, renameGroup, deleteChat, getMessages }
+export { newGroupChat, getMyChats, getMyGroups, addMembers, removeMembers, leaveGroup, sendAttachments, getGroupDetails, renameGroup, deleteChat, getMessages, oneToOneChat }

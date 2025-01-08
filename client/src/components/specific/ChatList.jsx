@@ -2,6 +2,7 @@ import { Stack } from "@mui/material";
 import React from "react";
 import ChatItem from "../shared/ChatItem";
 import { useSelector } from "react-redux";
+import { useOneToOneQuery } from "../../redux/api/api";
 
 function ChatList({
   w = "100%",
@@ -10,7 +11,7 @@ function ChatList({
   onlineUsers = [],
   newMessagesAlert = [{ chatId: "", count: 0 }],
   handleDeleteChat,
-}) {  
+}) {
   const {user}=useSelector(state=>state.auth)
   // console.log("chats=[]",chats,"user={}",user);
   return (
