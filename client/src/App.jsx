@@ -4,7 +4,7 @@ import ProtectedRoute from './components/auth/ProtectedRoute.jsx';
 import { LayoutLoader } from './components/layout/Loaders.jsx';
 import { server } from './constants/config.js';
 import { useDispatch, useSelector } from 'react-redux';
-import { userNotExist } from './redux/reducers/auth.reducer.js';
+import { userExist, userNotExist } from './redux/reducers/auth.reducer.js';
 const Home = lazy(() => import("./pages/Home.jsx"));
 const Login = lazy(() => import("./pages/Login.jsx"));
 const Chat = lazy(() => import("./pages/Chat.jsx"));
@@ -22,6 +22,15 @@ import { SocketProvider } from './Socket.jsx';
 function App() {
   const { user, isLoading } = useSelector(state => state.auth)
   const dispatch = useDispatch()
+  useEffect(() => {
+    // Check if user is present in localStorage on page load
+    const storedUser = JSON.parse(localStorage.getItem('user'));
+    if (storedUser) {
+      dispatch(userExist(storedUser));  // Dispatch user data into Redux store
+    } else {
+      dispatch(userNotExist());  // Dispatch userNotExist if no user is found in localStorage
+    }
+  }, [dispatch])
   // useEffect(()=>{
   //   const getMyProfile=async()=>{
   //     const response=await fetch(`${server}/api/v1/user/me`)
@@ -36,7 +45,6 @@ function App() {
     <>
       <BrowserRouter>
         <Suspense fallback={<LayoutLoader />}>
-
           <Routes>
             <Route element={<SocketProvider>
               <ProtectedRoute user={user} />

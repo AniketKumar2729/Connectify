@@ -57,7 +57,7 @@ io.use((socket, next) => {
 io.on("connection", (socket) => {
     const socketUser =socket.user
     // console.log(socketUser);    
-    userSocketIDs.set(socketUser._id, socket.id)
+    userSocketIDs.set(socketUser._id.toString(), socket.id)
     console.log(userSocketIDs);
     console.log("An user connected", socket.id)
     socket.on('NEW_MESSAGE', async ({ chatId, members, message }) => {
