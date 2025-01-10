@@ -41,7 +41,7 @@ function App() {
   //   }
   //   getMyProfile()
   // },[dispatch])
-  return (
+  return isLoading?<><LayoutLoader/></> :(
     <>
       <BrowserRouter>
         <Suspense fallback={<LayoutLoader />}>

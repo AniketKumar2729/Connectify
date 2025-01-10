@@ -50,8 +50,20 @@ const api=createApi({
                 body:data
             }),
             invalidatesTags:["Chat"]
+        }), 
+        chatDetails:builder.query({
+            query:({chatId,populate=false})=>{
+                let url=`/chat/${chatId}`
+                if(populate)
+                    url+="?populate=true"
+                return{
+                    url,
+                    credentials:"include"
+                }
+            },
+            providesTags:["Chat"],
         }),
     })
 })
 export default api;
-export const {useMyChatsQuery,useLazySearchUserQuery,useSendFriendRequestMutation,useGetNotificationQuery,useAcceptFriendRequestMutation,useOneToOneQuery}=api
+export const {useMyChatsQuery,useLazySearchUserQuery,useSendFriendRequestMutation,useGetNotificationQuery,useAcceptFriendRequestMutation,useOneToOneQuery,useChatDetailsQuery}=api

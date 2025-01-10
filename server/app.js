@@ -14,6 +14,7 @@ import { adminRouter } from "./routes/admin.routes.js";
 import { chatRouter } from "./routes/chat.routes.js";
 import { userRouter } from "./routes/user.routes.js";
 import { connectDB } from "./utils/features.utils.js";
+import { NEW_MESSAGE } from './constants/event.constants.js';
 // import { createSampleGroupChat, createSampleMessage, createSampleMessageInAGroup, createSampleSingleChat, createUser } from "./seeders/users.seeders.js";
 // createSampleSingleChat(10)
 // createSampleGroupChat(10)
@@ -55,13 +56,12 @@ io.use((socket, next) => {
     })
 })
 io.on("connection", (socket) => {
-    const socketUser =socket.user
+    const socketUser = socket.user
     // console.log(socketUser);    
     userSocketIDs.set(socketUser._id.toString(), socket.id)
     console.log(userSocketIDs);
     console.log("An user connected", socket.id)
-    socket.on('NEW_MESSAGE', async ({ chatId, members, message }) => {
-        const membersSockets = getSockets(members)
+    socket.on(NEW_MESSAGE, async ({ chatId, members, message }) => {
         const messageForRealTime = {
             content: message,
             _id: uuid(),
@@ -77,6 +77,7 @@ io.on("connection", (socket) => {
             sender: socketUser._id,
             chat: chatId
         }
+        const membersSockets = getSockets(members)
         io.to(membersSockets).emit("NEW_MESSAGE", {
             chatId,
             message: messageForRealTime
