@@ -1,7 +1,7 @@
 import AttachmentIcon from '@mui/icons-material/Attachment';
 import SendIcon from '@mui/icons-material/Send';
 import { IconButton, Skeleton, Stack } from '@mui/material';
-import React, { useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import FileMenu from '../components/dialogs/FileMenu';
 import AppLayout from '../components/layout/AppLayout';
 import MessageComponent from '../components/shared/MessageComponent';
@@ -21,6 +21,16 @@ function Chat({ chatId }) {
   const chatDetails = useChatDetailsQuery({ chatId, skip: !chatId }) 
   const [message, setMessage] = useState("")
   const members=chatDetails?.data?.group?.members
+
+  const newMessageHandler=useCallback((data)=>{
+    console.log(data)
+  })
+  useEffect(()=>{
+    socket.on(NEW_MESSAGE,newMessageHandler)
+    return ()=>{
+      socket.off(NEW_MESSAGE,newMessageHandler)
+    }
+  },[])
   const handleSubmit = (e) => {
     e.preventDefault()
     // !message get out of the function when nothing is present & !message.trim() help in getting out of the function don't allowing blank space 
@@ -29,6 +39,7 @@ function Chat({ chatId }) {
     socket.emit(NEW_MESSAGE, { chatId, members, message })
     setMessage("")
   }
+
   return chatDetails.isLoading ? <><Skeleton /></> : (
     <>
 
