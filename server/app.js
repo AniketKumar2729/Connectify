@@ -78,7 +78,7 @@ io.on("connection", (socket) => {
             chat: chatId
         }
         const membersSockets = getSockets(members)
-        io.to(membersSockets).emit("NEW_MESSAGE", {
+        io.to(membersSockets).emit(NEW_MESSAGE, {
             chatId,
             message: messageForRealTime
         })

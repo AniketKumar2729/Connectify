@@ -11,26 +11,22 @@ import { NEW_MESSAGE } from "../constants/event.constants.js";
 import { sampleMessage } from '../constants/sampleData';
 import { useChatDetailsQuery } from '../redux/api/api.js';
 import { getSocket } from '../Socket';
-const sampleUser = {
-  _id: "akdlkas",
-  name: "Hey"
-}
-function Chat({ chatId }) {
+import { useSocketEvent } from '../hooks/hook.jsx';
+
+function Chat({ chatId,user }) {
   const containerRef = useRef(null)
   const socket = getSocket()
-  const chatDetails = useChatDetailsQuery({ chatId, skip: !chatId }) 
+  const chatDetails = useChatDetailsQuery({ chatId, skip: !chatId })
+  //message is used for storing whatever user have written
   const [message, setMessage] = useState("")
-  const members=chatDetails?.data?.group?.members
-
-  const newMessageHandler=useCallback((data)=>{
-    console.log(data)
+  //messages is used for storing what are the message are there in a particular chat
+  const[messages,setMessages]=useState([])
+  const members = chatDetails?.data?.group?.members
+  const newMessageHandler = useCallback((data) => {
+    setMessages(prev=>[...prev,data.message])
   })
-  useEffect(()=>{
-    socket.on(NEW_MESSAGE,newMessageHandler)
-    return ()=>{
-      socket.off(NEW_MESSAGE,newMessageHandler)
-    }
-  },[])
+  const eventHandler = { [NEW_MESSAGE]: newMessageHandler }
+  useSocketEvent(socket, eventHandler)
   const handleSubmit = (e) => {
     e.preventDefault()
     // !message get out of the function when nothing is present & !message.trim() help in getting out of the function don't allowing blank space 
@@ -46,7 +42,7 @@ function Chat({ chatId }) {
       <Stack ref={containerRef} boxSizing={'border-box'} padding={'1rem'} spacing={'1rem'} bgcolor={gray} height={'90%'} sx={{ overflowY: 'auto', overflowX: 'hidden' }}>
         {/* messages  render */}
         {
-          sampleMessage.map(i => (<MessageComponent key={i._id} message={i} user={sampleUser} />))
+          messages.map(i => (<MessageComponent key={i._id} message={i} user={user} />))
         }
       </Stack>
       <form style={{ height: "10%" }} onSubmit={handleSubmit}>

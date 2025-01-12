@@ -17,6 +17,7 @@ const AppLayout = () => (WrappedComponent) => {
     const params = useParams();
     const chatId = params.id
     const { isMobileMenu } = useSelector((state) => state.misc)
+    const {user}=useSelector((state)=>state.auth)
     const dispatch = useDispatch()
     const { isLoading, data, isError, error, refetch } = useMyChatsQuery("")
     useErrors([{ isError, error }])
@@ -42,7 +43,7 @@ const AppLayout = () => (WrappedComponent) => {
 
           </Grid2>
           <Grid2 xs={12} sm={8} md={5} lg={6} size={6} sx={{ border: '2px solid blue' }} height={"100%"} >
-            {<WrappedComponent {...props} chatId={chatId} />}
+            {<WrappedComponent {...props} chatId={chatId} user={user} />}
           </Grid2>
           <Grid2 md={4} lg={6} size={3} sx={{ display: { xs: 'none', md: 'block' }, padding: "2rem", bgcolor: "rgba(0,0,0,0.85)", border: '2px solid orange' }} height={"100%"}>
             <Profile />
