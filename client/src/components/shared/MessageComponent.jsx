@@ -12,7 +12,7 @@ const MessageComponent = ({message,user}) => {
   return (
     <div style={{alignSelf:sameSender?'flex-end':'flex-start',background:sameSender?'#E88D67':'#006989',color:sameSender?'white':'black',borderRadius:'.5rem',padding:'.5rem',width:'fit-content'}}>
     {
-        !sameSender&&<Typography color={'#FFFBE6'} fontWeight={'600'} variant={'caption'}>{sender.name}</Typography>
+        !sameSender&&<Typography color={'#FFFBE6'} fontWeight={'600'} variant={'caption'}>{sender?.name}</Typography>
     }
     {
         content && <Typography>{content}</Typography>

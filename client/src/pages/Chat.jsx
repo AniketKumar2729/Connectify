@@ -12,7 +12,7 @@ import { sampleMessage } from '../constants/sampleData';
 import { useChatDetailsQuery, useGetOldMessagesQuery } from '../redux/api/api.js';
 import { getSocket } from '../Socket';
 import { useErrors, useSocketEvent } from '../hooks/hook.jsx';
-
+import { useInfiniteScrollTop } from "6pp"
 function Chat({ chatId, user }) {
   //message is used for storing whatever user have written
   const [message, setMessage] = useState("")
@@ -25,6 +25,9 @@ function Chat({ chatId, user }) {
 
   const chatDetails = useChatDetailsQuery({ chatId, skip: !chatId })
   const oldMessagesChunk = useGetOldMessagesQuery({ chatId, page })
+
+  
+  const { data: oldMessages, setData: setOldMessages } = useInfiniteScrollTop(containerRef, oldMessagesChunk.data?.totalPage, page, setPage, oldMessagesChunk.data?.messages)
   const errors = [{ isError: chatDetails.isError, error: chatDetails.error }, { isError: oldMessagesChunk.isError, error: oldMessagesChunk.error }]
   const members = chatDetails?.data?.group?.members
   const newMessageHandler = useCallback((data) => {
@@ -40,18 +43,18 @@ function Chat({ chatId, user }) {
     socket.emit(NEW_MESSAGE, { chatId, members, message })
     setMessage("")
   }
+  let allMessages=[...oldMessages||[],...messages]
   useErrors(errors)
-
   return chatDetails.isLoading ? <><Skeleton /></> : (
     <>
 
       <Stack ref={containerRef} boxSizing={'border-box'} padding={'1rem'} spacing={'1rem'} bgcolor={gray} height={'90%'} sx={{ overflowY: 'auto', overflowX: 'hidden' }}>
         {/* messages  render */}
-        {
+        {/* {
           !oldMessagesChunk.isLoading && oldMessagesChunk.data?.messages?.map(i => (<MessageComponent key={i._id} message={i} user={user} />))
-        }
+        } */}
         {
-          messages.map(i => (<MessageComponent key={i._id} message={i} user={user} />))
+          allMessages.map(i => (<MessageComponent key={i._id} message={i} user={user} />))
         }
       </Stack>
       <form style={{ height: "10%" }} onSubmit={handleSubmit}>
