@@ -14,7 +14,10 @@ const fileFormat = (url = "") => {
     else
         return 'file';
 }
-const tranformImage = (url = "", width = 100) => url
+const tranformImage = (url = "", width = 100) =>{
+    const newUrl=url.replace("upload/",`upload/,dpr_auto/w_${width}/`)
+    return newUrl
+}
 const getLast7Days = () => {
     const currentDate = moment();
     const last7days = []
@@ -25,4 +28,4 @@ const getLast7Days = () => {
     }
     return last7days;
 };
-export { fileFormat, tranformImage, getLast7Days }
+export { fileFormat, tranformImage, getLast7Days}

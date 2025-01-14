@@ -1,24 +1,27 @@
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useDispatch } from "react-redux";
 import AttachmentIcon from '@mui/icons-material/Attachment';
 import SendIcon from '@mui/icons-material/Send';
 import { IconButton, Skeleton, Stack } from '@mui/material';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
 import FileMenu from '../components/dialogs/FileMenu';
 import AppLayout from '../components/layout/AppLayout';
 import MessageComponent from '../components/shared/MessageComponent';
 import { InputBox } from '../components/styles/StyledComponent';
 import { gray } from '../constants/color';
 import { NEW_MESSAGE } from "../constants/event.constants.js";
-import { sampleMessage } from '../constants/sampleData';
 import { useChatDetailsQuery, useGetOldMessagesQuery } from '../redux/api/api.js';
 import { getSocket } from '../Socket';
 import { useErrors, useSocketEvent } from '../hooks/hook.jsx';
 import { useInfiniteScrollTop } from "6pp"
+import { setIsFileMenu } from '../redux/reducers/miscellaneous.reducers.js';
 function Chat({ chatId, user }) {
+  const dispatch = useDispatch()
   //message is used for storing whatever user have written
   const [message, setMessage] = useState("")
   //messages is used for storing what are the message are there in a particular chat
   const [messages, setMessages] = useState([])
   const [page, setPage] = useState(1)
+  const [fileMenuAnchor, setFileMenuAnchor] = useState(null)
 
   const containerRef = useRef(null)
   const socket = getSocket()
@@ -26,7 +29,6 @@ function Chat({ chatId, user }) {
   const chatDetails = useChatDetailsQuery({ chatId, skip: !chatId })
   const oldMessagesChunk = useGetOldMessagesQuery({ chatId, page })
 
-  
   const { data: oldMessages, setData: setOldMessages } = useInfiniteScrollTop(containerRef, oldMessagesChunk.data?.totalPage, page, setPage, oldMessagesChunk.data?.messages)
   const errors = [{ isError: chatDetails.isError, error: chatDetails.error }, { isError: oldMessagesChunk.isError, error: oldMessagesChunk.error }]
   const members = chatDetails?.data?.group?.members
@@ -35,6 +37,7 @@ function Chat({ chatId, user }) {
   })
   const eventHandler = { [NEW_MESSAGE]: newMessageHandler }
   useSocketEvent(socket, eventHandler)
+
   const handleSubmit = (e) => {
     e.preventDefault()
     // !message get out of the function when nothing is present & !message.trim() help in getting out of the function don't allowing blank space 
@@ -43,7 +46,14 @@ function Chat({ chatId, user }) {
     socket.emit(NEW_MESSAGE, { chatId, members, message })
     setMessage("")
   }
-  let allMessages=[...oldMessages||[],...messages]
+
+  const handleFileOpen = (e) => {
+    // e.preventDefault()
+    dispatch(setIsFileMenu(true))
+    setFileMenuAnchor(e.currentTarget)
+  }
+  let allMessages = [...oldMessages || [], ...messages]
+  console.log("all Messsges are",allMessages)
   useErrors(errors)
   return chatDetails.isLoading ? <><Skeleton /></> : (
     <>
@@ -59,7 +69,7 @@ function Chat({ chatId, user }) {
       </Stack>
       <form style={{ height: "10%" }} onSubmit={handleSubmit}>
         <Stack direction={'row'} height={'100%'} padding={'1rem'} alignItems={'center'} position={'relative'}>
-          <IconButton sx={{ position: 'absolute', left: '1.5rem', rotate: '-20deg' }}>
+          <IconButton sx={{ position: 'absolute', left: '1.5rem', rotate: '-40deg' }} onClick={handleFileOpen}>
             <AttachmentIcon />
           </IconButton>
           <InputBox placeholder='Enter your message' value={message} onChange={(e) => setMessage(e.target.value)} />
@@ -68,7 +78,7 @@ function Chat({ chatId, user }) {
           </IconButton>
         </Stack>
       </form>
-      <FileMenu />
+      <FileMenu anchor={fileMenuAnchor} chatId={chatId} />
     </>
   )
 }

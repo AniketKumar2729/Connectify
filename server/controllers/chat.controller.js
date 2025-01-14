@@ -4,7 +4,7 @@ import { errorHandler, TryCatch } from "../middlewares/errorHandler.middleware.j
 import { Chat } from "../models/chat.model.js";
 import { User } from "../models/user.model.js";
 import { Message } from "../models/message.model.js";
-import { deleteFilesFromCloudinary, emitEvent } from "../utils/features.utils.js";
+import { deleteFilesFromCloudinary, emitEvent, uploadFileIntoCloudinary } from "../utils/features.utils.js";
 
 const newGroupChat = TryCatch(async (req, res, next) => {
     const { name, members } = req.body
@@ -185,7 +185,7 @@ const sendAttachments = TryCatch(async (req, res, next) => {
     if (files.length < 1)
         return next(errorHandler(400, "Please provide some attachments"))
     //upload file here
-    const attachments = []
+    const attachments = await uploadFileIntoCloudinary(files)
     const messageForRealTime = { content: "", attachments, sender: { _id: verifiedUser._id, name: verifiedUser.name }, chat: chatId } //this is for web socket(Socket.io)
     const messageForDB = { content: "", attachments, sender: verifiedUser._id, chat: chatId }//this is for database
     const message = await Message.create(messageForDB)
