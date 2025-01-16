@@ -33,6 +33,8 @@ function Chat({ chatId, user }) {
   const errors = [{ isError: chatDetails.isError, error: chatDetails.error }, { isError: oldMessagesChunk.isError, error: oldMessagesChunk.error }]
   const members = chatDetails?.data?.group?.members
   const newMessageHandler = useCallback((data) => {
+    console.log("console coming form  newMessageHandler Chat.jsx :- ", data)
+    if (data.chatId !== chatId) return;
     setMessages(prev => [...prev, data.message])
   })
   const eventHandler = { [NEW_MESSAGE]: newMessageHandler }
@@ -46,14 +48,21 @@ function Chat({ chatId, user }) {
     socket.emit(NEW_MESSAGE, { chatId, members, message })
     setMessage("")
   }
-
+useEffect(()=>{
+  return ()=>{
+    setMessage("")
+    setMessages([])
+    setOldMessages([])
+    setPage(1)
+  }
+},[chatId])
   const handleFileOpen = (e) => {
     // e.preventDefault()
     dispatch(setIsFileMenu(true))
     setFileMenuAnchor(e.currentTarget)
   }
   let allMessages = [...oldMessages || [], ...messages]
-  console.log("all Messsges are",allMessages)
+  // console.log("all Messsges are",allMessages)
   useErrors(errors)
   return chatDetails.isLoading ? <><Skeleton /></> : (
     <>
