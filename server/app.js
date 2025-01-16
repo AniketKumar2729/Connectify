@@ -33,6 +33,7 @@ const io = new Server(server, {
     cors:
         corsOptions
 })
+app.set("io",io)
 // Using Middlewares Here
 
 //express.json() is used when we hit the endpoint with thunder client we  type json in body

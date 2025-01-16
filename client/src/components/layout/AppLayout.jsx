@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import Header from "./Header";
 import Title from "../shared/Title";
 import { Drawer, Grid2, Skeleton } from "@mui/material";
@@ -9,18 +9,32 @@ import Profile from "../specific/Profile.jsx";
 import { useMyChatsQuery } from "../../redux/api/api.js";
 import { useDispatch, useSelector } from "react-redux";
 import { setIsMobileMenu } from "../../redux/reducers/miscellaneous.reducers.js";
-import { useErrors } from "../../hooks/hook.jsx";
+import { useErrors, useSocketEvent } from "../../hooks/hook.jsx";
 import { getSocket } from "../../Socket.jsx";
+import { NEW_MESSAGE_ALERT, NEW_REQUEST } from "../../constants/event.constants.js";
+import { incrementNotificaiton } from "../../redux/reducers/chat.reducer.js";
 
 const AppLayout = () => (WrappedComponent) => {
   return (props) => {
     const params = useParams();
     const chatId = params.id
+    const socket = getSocket()
     const { isMobileMenu } = useSelector((state) => state.misc)
-    const {user}=useSelector((state)=>state.auth)
+    const { user } = useSelector((state) => state.auth)
     const dispatch = useDispatch()
     const { isLoading, data, isError, error, refetch } = useMyChatsQuery("")
     useErrors([{ isError, error }])
+
+    const newMessageAlertHandler = useCallback(() => { }, [])
+    const newRequestAlertHandler = useCallback(() => {
+      dispatch(incrementNotificaiton())
+    }, [dispatch])
+    const eventHandlers = {
+      [NEW_MESSAGE_ALERT]: newMessageAlertHandler,
+      [NEW_REQUEST]: newRequestAlertHandler,
+    }
+    useSocketEvent(socket, eventHandlers)
+
     const handleDeleteChat = (e, _id, groupChat) => {
       e.preventDefault();
       console.log("delete chat", _id, groupChat);

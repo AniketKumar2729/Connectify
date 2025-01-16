@@ -3,7 +3,7 @@ import mongoose from "mongoose"
 import jwt from "jsonwebtoken";
 import { v4 as uuid } from "uuid";
 import { v2 as cloudinary } from "cloudinary";
-import { getBase64 } from "../lib/helper.lib.js";
+import { getBase64, getSockets } from "../lib/helper.lib.js";
 dotenv.config();
 export const connectDB = (uri) => {
     mongoose.connect(process.env.MONGODB_URI).then(() => {
@@ -19,7 +19,7 @@ export const cookieOption = {
 
 }
 export const sendToken = (res, user, code, message) => {
-    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET)   
+    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET)
     return res.status(code).cookie('Connectify-token', token, cookieOption).json({
         success: true,
         message,
@@ -28,7 +28,10 @@ export const sendToken = (res, user, code, message) => {
 }
 
 export const emitEvent = (req, event, users, data) => {
-    console.log("emitting event", event);
+    let io=req.app.get("io");
+    const usersSockets = getSockets(users)
+    io.to(usersSockets).emit(event,data)
+    // console.log("emitting event", event);
 }
 
 export const uploadFileIntoCloudinary = async (files = []) => {
@@ -54,7 +57,7 @@ export const uploadFileIntoCloudinary = async (files = []) => {
         }));
         return formattedResult;
     } catch (error) {
-        throw new Error("Error uploading files to Cloudinary",error);
+        throw new Error("Error uploading files to Cloudinary", error);
     }
 };
 
