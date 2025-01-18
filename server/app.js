@@ -14,7 +14,7 @@ import { adminRouter } from "./routes/admin.routes.js";
 import { chatRouter } from "./routes/chat.routes.js";
 import { userRouter } from "./routes/user.routes.js";
 import { connectDB } from "./utils/features.utils.js";
-import { NEW_MESSAGE } from './constants/event.constants.js';
+import { NEW_MESSAGE,NEW_MESSAGE_ALERT } from './constants/event.constants.js';
 // import { createSampleGroupChat, createSampleMessage, createSampleMessageInAGroup, createSampleSingleChat, createUser } from "./seeders/users.seeders.js";
 // createSampleSingleChat(10)
 // createSampleGroupChat(10)
@@ -83,7 +83,7 @@ io.on("connection", (socket) => {
             chatId,
             message: messageForRealTime
         })
-        io.to(membersSockets).emit("NEW_MESSAGE_ALERT", {
+        io.to(membersSockets).emit(NEW_MESSAGE_ALERT, {
             chatId
         })
         try {

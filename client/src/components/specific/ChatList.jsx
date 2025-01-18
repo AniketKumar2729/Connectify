@@ -1,21 +1,23 @@
 import { Stack } from "@mui/material";
 import React from "react";
 import ChatItem from "../shared/ChatItem";
+import { useSelector } from "react-redux";
 
 function ChatList({
   w = "100%",
   chats = [],
   chatId,
   onlineUsers = [],
-  newMessagesAlert = [{ chatId: "", count: 0 }],
   handleDeleteChat,
 }) {
-  // console.log("chats=[]",chats,"user={}",user);
+  const {newMessagesAlert}=useSelector((state)=>state.chat)
+  // console.log("chats=[]",chats,"newMessageAlert :- ",newMessagesAlert);
+  // console.log("ChatList received newMessagesAlert:", newMessagesAlert);
   return (
     <Stack width={w} direction={"column"}>
       {chats?.map((data, idx) => {
         const { _id, name, groupChat, avatar, members } = data;
-        const newMessageAlert = newMessagesAlert.find(
+        let newMessageAlert = newMessagesAlert?.find(
           ({ chatId }) => chatId == _id
         );
 

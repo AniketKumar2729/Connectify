@@ -83,7 +83,7 @@ const api = createApi({
                     messages: accumulatedMessages, // Return the merged array
                 };
             },
-            providesTags: ["Message"],
+            keepUnusedDataFor:0,
         }),
         sendAttachments: builder.mutation({
             query: (data) => ({

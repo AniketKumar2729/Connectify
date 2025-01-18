@@ -14,6 +14,7 @@ import { getSocket } from '../Socket';
 import { useErrors, useSocketEvent } from '../hooks/hook.jsx';
 import { useInfiniteScrollTop } from "6pp"
 import { setIsFileMenu } from '../redux/reducers/miscellaneous.reducers.js';
+import { removeNewMessagesAlert } from '../redux/reducers/chat.reducer.js';
 function Chat({ chatId, user }) {
   const dispatch = useDispatch()
   //message is used for storing whatever user have written
@@ -33,10 +34,9 @@ function Chat({ chatId, user }) {
   const errors = [{ isError: chatDetails.isError, error: chatDetails.error }, { isError: oldMessagesChunk.isError, error: oldMessagesChunk.error }]
   const members = chatDetails?.data?.group?.members
   const newMessageHandler = useCallback((data) => {
-    console.log("console coming form  newMessageHandler Chat.jsx :- ", data)
     if (data.chatId !== chatId) return;
     setMessages(prev => [...prev, data.message])
-  })
+  },[chatId])
   const eventHandler = { [NEW_MESSAGE]: newMessageHandler }
   useSocketEvent(socket, eventHandler)
 
@@ -49,6 +49,7 @@ function Chat({ chatId, user }) {
     setMessage("")
   }
 useEffect(()=>{
+  dispatch(removeNewMessagesAlert(chatId))
   return ()=>{
     setMessage("")
     setMessages([])

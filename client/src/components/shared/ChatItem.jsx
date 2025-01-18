@@ -31,7 +31,7 @@ function ChatItem({
       <Stack>
           <Typography>{name}</Typography>
           {newMessageAlert && (
-            <Typography>{newMessageAlert.count} new message</Typography>
+            <Typography>{newMessageAlert?.count} new message</Typography>
           )}
         </Stack>
         {isOnline && (
