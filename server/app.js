@@ -14,7 +14,7 @@ import { adminRouter } from "./routes/admin.routes.js";
 import { chatRouter } from "./routes/chat.routes.js";
 import { userRouter } from "./routes/user.routes.js";
 import { connectDB } from "./utils/features.utils.js";
-import { NEW_MESSAGE,NEW_MESSAGE_ALERT } from './constants/event.constants.js';
+import { NEW_MESSAGE,NEW_MESSAGE_ALERT, START_TYPING, STOP_TYPING } from './constants/event.constants.js';
 // import { createSampleGroupChat, createSampleMessage, createSampleMessageInAGroup, createSampleSingleChat, createUser } from "./seeders/users.seeders.js";
 // createSampleSingleChat(10)
 // createSampleGroupChat(10)
@@ -94,6 +94,18 @@ io.on("connection", (socket) => {
         }
 
     })
+    socket.on(START_TYPING,({members,chatId})=>{
+        // console.log("Members:- ",members,"\t","chatId:- ",chatId)
+        const memberSocket=getSockets(members)
+        socket.to(memberSocket).emit(START_TYPING,{chatId})
+    })
+    
+    socket.on(STOP_TYPING,({members,chatId})=>{
+        // console.log("Members:- ",members,"\t","chatId:- ",chatId)
+        const memberSocket=getSockets(members)
+        socket.to(memberSocket).emit(STOP_TYPING,{chatId})
+    })
+
     socket.on("disconnect", () => {
         userSocketIDs.delete(socketUser._id.toString())
         console.log("User Disconnect");
