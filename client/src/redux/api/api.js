@@ -105,9 +105,20 @@ const api = createApi({
                 credentials: "include"
             }),
             providesTags: ["Chat"]
+        }),
+        avaliableFriends: builder.query({
+            query: (chatId) => {
+                let url = "/user/friends"
+                if (chatId) url += `?chatId=${chatId}`
+                return {
+                    url,
+                    credentials: 'include'
+                }
+            },
+            providesTags:["Chat"]
         })
 
     })
 })
 export default api;
-export const { useMyChatsQuery, useLazySearchUserQuery, useSendFriendRequestMutation, useGetNotificationQuery, useAcceptFriendRequestMutation, useOneToOneQuery, useChatDetailsQuery, useGetOldMessagesQuery, useSendAttachmentsMutation, useMyGroupsQuery } = api
+export const { useMyChatsQuery, useLazySearchUserQuery, useSendFriendRequestMutation, useGetNotificationQuery, useAcceptFriendRequestMutation, useOneToOneQuery, useChatDetailsQuery, useGetOldMessagesQuery, useSendAttachmentsMutation, useMyGroupsQuery,useAvaliableFriendsQuery } = api

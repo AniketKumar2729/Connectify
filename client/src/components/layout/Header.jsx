@@ -21,7 +21,7 @@ import { useNavigate } from "react-router-dom";
 import { server } from '../../constants/config.js'
 import { userNotExist } from "../../redux/reducers/auth.reducer.js"
 import { useDispatch, useSelector } from "react-redux";
-import { setIsMobileMenu, setIsNotification, setIsSearch } from "../../redux/reducers/miscellaneous.reducers.js";
+import { setIsMobileMenu, setIsNewGroup, setIsNotification, setIsSearch } from "../../redux/reducers/miscellaneous.reducers.js";
 import { resetNotificaiton } from "../../redux/reducers/chat.reducer.js";
 let Search = lazy(() => import("../specific/Search.jsx"));
 let Notification = lazy(() => import("../specific/Notification.jsx"))
@@ -32,7 +32,7 @@ const Header = () => {
   let [group, setGroup] = useState(false);
   let [notification, setNotification] = useState(false);
   const dispatch = useDispatch()
-  const { isSearch, isNotification } = useSelector((state) => state.misc)
+  const { isSearch, isNotification,isNewGroup } = useSelector((state) => state.misc)
   const { notificationCount } = useSelector((state) => state.chat)
   const handleMobile = () => {
     dispatch(setIsMobileMenu(true))
@@ -41,7 +41,7 @@ const Header = () => {
     dispatch(setIsSearch(true))
   };
   const openNewGroup = () => {
-    setGroup(prev => !prev)
+    dispatch(setIsNewGroup(true))
   };
   const navigateToGroup = () => {
     navigate("/group");
@@ -130,7 +130,7 @@ const Header = () => {
         isSearch && (<Suspense fallback={<Backdrop open />}><Search /></Suspense>)
       }
       {
-        group && (<Suspense fallback={<Backdrop open />}><NewGroup /></Suspense>)
+        isNewGroup && (<Suspense fallback={<Backdrop open />}><NewGroup /></Suspense>)
       }
       {
         isNotification && (<Suspense fallback={<Backdrop open />}><Notification /></Suspense>)
