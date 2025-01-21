@@ -83,7 +83,7 @@ const api = createApi({
                     messages: accumulatedMessages, // Return the merged array
                 };
             },
-            keepUnusedDataFor:0,
+            keepUnusedDataFor: 0,
         }),
         sendAttachments: builder.mutation({
             query: (data) => ({
@@ -98,9 +98,16 @@ const api = createApi({
                 }
                 return response
             }
+        }),
+        myGroups: builder.query({
+            query: () => ({
+                url: "/chat/my/groups",
+                credentials: "include"
+            }),
+            providesTags: ["Chat"]
         })
 
     })
 })
 export default api;
-export const { useMyChatsQuery, useLazySearchUserQuery, useSendFriendRequestMutation, useGetNotificationQuery, useAcceptFriendRequestMutation, useOneToOneQuery, useChatDetailsQuery, useGetOldMessagesQuery, useSendAttachmentsMutation } = api
+export const { useMyChatsQuery, useLazySearchUserQuery, useSendFriendRequestMutation, useGetNotificationQuery, useAcceptFriendRequestMutation, useOneToOneQuery, useChatDetailsQuery, useGetOldMessagesQuery, useSendAttachmentsMutation, useMyGroupsQuery } = api

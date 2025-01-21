@@ -11,6 +11,9 @@ import { Link } from '../components/styles/StyledComponent';
 import AvatarCard from '../components/shared/AvatarCard';
 import { sampleChats, sampleUser } from '../constants/sampleData';
 import UserItem from '../components/shared/UserItem.jsx';
+import { useMyGroupsQuery } from '../redux/api/api.js';
+import { useErrors } from '../hooks/hook.jsx';
+import { LayoutLoader } from '../components/layout/Loaders.jsx';
 //lazzy load
 const DeleteDialog = lazy(() => import("../components/dialogs/DeleteDialog.jsx"))
 const AddMemberDialog = lazy(() => import("../components/dialogs/AddMemberDialog.jsx"))
@@ -18,12 +21,23 @@ const AddMemberDialog = lazy(() => import("../components/dialogs/AddMemberDialog
 const Group = () => {
   const groupId = useSearchParams()[0].get('group')
   const navigate = useNavigate()
+
+  const myGroups=useMyGroupsQuery()
+console.log(myGroups.data)
+
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [groupName, setGroupName] = useState("");
   const [updatedgroupName, setUpdatedGroupName] = useState("");
   const [confirmDeleteDialog, setConfirmDeleteDialog] = useState(false)
   const isAddMember = false;
+
+  const errors=[{
+    isError:myGroups.isError,
+    error:myGroups.error
+  }]
+  useErrors(errors)
+
   const hanldeMobile = () => {
     setIsMobileMenuOpen(prev => !prev)
   }
@@ -105,7 +119,7 @@ const Group = () => {
       <Button size='large' color='error' variant='outlined' endIcon={<DeleteIcon />} onClick={deleteHandler}> Delete Group</Button>
     </Stack>
   )
-  return (
+  return myGroups.isLoading?<LayoutLoader/>: (
     <Grid
       container
       height={'100vh'}

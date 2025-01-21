@@ -8,7 +8,7 @@ import AppLayout from '../components/layout/AppLayout';
 import MessageComponent from '../components/shared/MessageComponent';
 import { InputBox } from '../components/styles/StyledComponent';
 import { gray } from '../constants/color';
-import { NEW_MESSAGE, START_TYPING, STOP_TYPING } from "../constants/event.constants.js";
+import { ALERT, NEW_MESSAGE, START_TYPING, STOP_TYPING } from "../constants/event.constants.js";
 import { useChatDetailsQuery, useGetOldMessagesQuery } from '../redux/api/api.js';
 import { getSocket } from '../Socket';
 import { useErrors, useSocketEvent } from '../hooks/hook.jsx';
@@ -25,10 +25,10 @@ function Chat({ chatId, user }) {
   const [page, setPage] = useState(1)
   const [fileMenuAnchor, setFileMenuAnchor] = useState(null)
 
-  const [IamTyping,setIamTyping]=useState(false)
-  const [userTyping,setUserTyping]=useState(false)
-  const typingTimeout=useRef(null)
-  const bottomRef=useRef(null)
+  const [IamTyping, setIamTyping] = useState(false)
+  const [userTyping, setUserTyping] = useState(false)
+  const typingTimeout = useRef(null)
+  const bottomRef = useRef(null)
 
   const containerRef = useRef(null)
   const socket = getSocket()
@@ -55,7 +55,20 @@ function Chat({ chatId, user }) {
     setUserTyping(false)
   }, [chatId])
 
-  const eventHandler = { [NEW_MESSAGE]: newMessageListener, [START_TYPING]: startTypingListener,[STOP_TYPING]: stopTypingListener }
+  const alertListener = useCallback((data) => {
+    const messageForAlert = {
+      content: data,
+      sender: {
+        _id: "randomId1",
+        name: "Admin"
+      },
+      chat: chatId,
+      createdAt: new Date().toISOString()
+    }
+    setMessages((prev)=>[...prev,messageForAlert])
+  }, [chatId])
+
+  const eventHandler = { [NEW_MESSAGE]: newMessageListener, [START_TYPING]: startTypingListener, [STOP_TYPING]: stopTypingListener, [ALERT]: alertListener }
   useSocketEvent(socket, eventHandler)
 
   const handleSubmit = (e) => {
@@ -76,23 +89,23 @@ function Chat({ chatId, user }) {
     }
   }, [chatId])
 
-  useEffect(()=>{
-    if(bottomRef.current) bottomRef.current.scrollIntoView({
-      behavior:"smooth"
+  useEffect(() => {
+    if (bottomRef.current) bottomRef.current.scrollIntoView({
+      behavior: "smooth"
     })
-  },[messages])
+  }, [messages])
   const messageChangeHandler = (e) => {
     setMessage(e.target.value)
     //  console.log(message)
-    if(!IamTyping){
+    if (!IamTyping) {
       socket.emit(START_TYPING, { members, chatId })
       setIamTyping(true)
     }
-    if(typingTimeout.current) clearTimeout(typingTimeout.current)
-    typingTimeout.current= setTimeout(()=>{
-      socket.emit(STOP_TYPING,{members,chatId})
+    if (typingTimeout.current) clearTimeout(typingTimeout.current)
+    typingTimeout.current = setTimeout(() => {
+      socket.emit(STOP_TYPING, { members, chatId })
       setIamTyping(false)
-    },[2000])
+    }, [2000])
   }
   const handleFileOpen = (e) => {
     // e.preventDefault()
@@ -115,10 +128,10 @@ function Chat({ chatId, user }) {
         }
 
         {
-          userTyping && <TypingLoader/>
+          userTyping && <TypingLoader />
         }
 
-        <div ref={bottomRef}/>
+        <div ref={bottomRef} />
       </Stack>
       <form style={{ height: "10%" }} onSubmit={handleSubmit}>
         <Stack direction={'row'} height={'100%'} padding={'1rem'} alignItems={'center'} position={'relative'}>
