@@ -11,8 +11,8 @@ import { Link } from '../components/styles/StyledComponent';
 import AvatarCard from '../components/shared/AvatarCard';
 import { sampleChats, sampleUser } from '../constants/sampleData';
 import UserItem from '../components/shared/UserItem.jsx';
-import { useChatDetailsQuery, useMyGroupsQuery } from '../redux/api/api.js';
-import { useErrors } from '../hooks/hook.jsx';
+import { useChatDetailsQuery, useMyGroupsQuery, useRenameGroupMutation } from '../redux/api/api.js';
+import { useAsyncMutation, useErrors } from '../hooks/hook.jsx';
 import { LayoutLoader } from '../components/layout/Loaders.jsx';
 //lazzy load
 const DeleteDialog = lazy(() => import("../components/dialogs/DeleteDialog.jsx"))
@@ -24,6 +24,7 @@ const Group = () => {
 
   const myGroups = useMyGroupsQuery()
   const groupDetails = useChatDetailsQuery({ chatId: groupId, populate: true }, { skip: !groupId })
+  const [updateGroup,isLoadingGroupName]=useAsyncMutation(useRenameGroupMutation)
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
@@ -65,6 +66,7 @@ const Group = () => {
   }
   const updateGroupNameHandler = () => {
     setIsEdit(false)
+    updateGroup("Updating Group Name...",{groupname:updatedgroupName,groupId})
   }
   const deleteHandler = () => {
     setConfirmDeleteDialog(true);
@@ -123,10 +125,10 @@ const Group = () => {
         isEdit ? <>
 
           <TextField value={updatedgroupName} onChange={e => setUpdatedGroupName(e.target.value)} />
-          <IconButton onClick={updateGroupNameHandler}><DoneAllIcon /></IconButton>
+          <IconButton onClick={updateGroupNameHandler} disabled={isLoadingGroupName}><DoneAllIcon /></IconButton>
         </> : <>
           <Typography variant='h4'>{groupName}</Typography>
-          <IconButton onClick={() => setIsEdit(true)}><EditIcon /></IconButton>
+          <IconButton onClick={() => setIsEdit(true)} disabled={isLoadingGroupName}><EditIcon /></IconButton>
         </>
       }
     </Stack>
