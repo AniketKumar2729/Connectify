@@ -11,7 +11,7 @@ import { Link } from '../components/styles/StyledComponent';
 import AvatarCard from '../components/shared/AvatarCard';
 import { sampleChats, sampleUser } from '../constants/sampleData';
 import UserItem from '../components/shared/UserItem.jsx';
-import { useMyGroupsQuery } from '../redux/api/api.js';
+import { useChatDetailsQuery, useMyGroupsQuery } from '../redux/api/api.js';
 import { useErrors } from '../hooks/hook.jsx';
 import { LayoutLoader } from '../components/layout/Loaders.jsx';
 //lazzy load
@@ -22,21 +22,40 @@ const Group = () => {
   const groupId = useSearchParams()[0].get('group')
   const navigate = useNavigate()
 
-  const myGroups=useMyGroupsQuery()
-console.log(myGroups.data)
+  const myGroups = useMyGroupsQuery()
+  const groupDetails = useChatDetailsQuery({ chatId: groupId, populate: true }, { skip: !groupId })
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [groupName, setGroupName] = useState("");
   const [updatedgroupName, setUpdatedGroupName] = useState("");
+  const [groupMembers,setGroupMembers]=useState([])
   const [confirmDeleteDialog, setConfirmDeleteDialog] = useState(false)
   const isAddMember = false;
 
-  const errors=[{
-    isError:myGroups.isError,
-    error:myGroups.error
+  const errors = [{
+    isError: myGroups.isError,
+    error: myGroups.error
+  }, {
+    isError: groupDetails.isError,
+    error: groupDetails.error
   }]
   useErrors(errors)
+
+  useEffect(() => {
+    const groupData = groupDetails?.data
+    if (groupData) {
+      setGroupName(groupData?.group?.name);
+      setUpdatedGroupName(groupData?.group?.name);
+      setGroupMembers( groupDetails?.data?.group?.members)
+    }
+    return ()=>{
+      setGroupName("")
+      setUpdatedGroupName("")
+      setGroupMembers([])
+      setIsEdit(false)
+    }
+  }, [groupDetails.data])
 
   const hanldeMobile = () => {
     setIsMobileMenuOpen(prev => !prev)
@@ -59,18 +78,17 @@ console.log(myGroups.data)
     setConfirmDeleteDialog(false)
   }
 
-  const removeMemberHandler=(id)=>{
-    console.log('remove member'+id);
-    
+  const removeMemberHandler = (id) => {
+    console.log('remove member' + id);
   }
   const openAddHandler = () => { }
   useEffect(() => {
-    if(groupId){
+    if (groupId) {
       setGroupName(`Group Name ${groupId}`)
       setUpdatedGroupName(`groupname ${groupId}`);
     }
     //clean up function
-    return()=>{
+    return () => {
       setGroupName('')
       setUpdatedGroupName('')
       setIsEdit(false)
@@ -119,7 +137,7 @@ console.log(myGroups.data)
       <Button size='large' color='error' variant='outlined' endIcon={<DeleteIcon />} onClick={deleteHandler}> Delete Group</Button>
     </Stack>
   )
-  return myGroups.isLoading?<LayoutLoader/>: (
+  return myGroups.isLoading ? <LayoutLoader /> : (
     <Grid
       container
       height={'100vh'}
@@ -136,7 +154,7 @@ console.log(myGroups.data)
           },
         }}
       >
-        <GroupList myGroups={sampleChats} groupId={groupId} />
+        <GroupList myGroups={myGroups?.data?.groups} groupId={groupId} />
       </Grid>
       <Grid
         item
@@ -151,21 +169,19 @@ console.log(myGroups.data)
         }}
       >
         {IconsBtns}
-        {
-          groupName && <>
-            {GroupNames}
-            <Typography margin={'2rem'} alignSelf={'flex-start'} variant='body1'>Members</Typography>
-            <Stack maxWidth={'45rem'} width={'100%'} boxSizing={'border-box'} padding={{ sm: '1rem', xs: '0', md: '1rem 4rem' }} spacing={'2rem'} height={'50vh'} overflow={'auto'}>
-              {/** members*/}
-              {
-                sampleUser.map((i) => (
-                  <UserItem user={i} key={i._id} isAdded styling={{boxShadow:'0 0 0.5rem rgba(0,0,0,0.2)',padding:'1rem',borderRadius:'2rem'}}  handler={removeMemberHandler}/>
-                ))
-              }
-            </Stack>
-            {ButtonGroup}
-          </>
-        }
+        {groupName && <>
+          {GroupNames}
+          <Typography margin={'2rem'} alignSelf={'flex-start'} variant='body1'>Members</Typography>
+          <Stack maxWidth={'45rem'} width={'100%'} boxSizing={'border-box'} padding={{ sm: '1rem', xs: '0', md: '1rem 4rem' }} spacing={'2rem'} height={'50vh'} overflow={'auto'}>
+            {/** members*/}
+            {
+              groupMembers?.map((i) => (
+                <UserItem user={i} key={i._id} isAdded styling={{ boxShadow: '0 0 0.5rem rgba(0,0,0,0.2)', padding: '1rem', borderRadius: '2rem' }} handler={removeMemberHandler} />
+              ))
+            }
+          </Stack>
+          {ButtonGroup}
+        </>}
       </Grid>
       {
         isAddMember && <Suspense fallback={<Backdrop open />}>
@@ -176,14 +192,14 @@ console.log(myGroups.data)
         confirmDeleteDialog && <Suspense fallback={<Backdrop open />}><DeleteDialog open={confirmDeleteDialog} handleClose={closeDialog} deleteHandler={dltHandler} /></Suspense>
       }
       <Drawer open={isMobileMenuOpen} onClose={hanldeMobileClose} sx={{ display: { xs: 'block', sm: 'none' } }} >
-        <GroupList w={'50vw'} myGroups={sampleChats} groupId={groupId} />
+        <GroupList w={'50vw'} myGroups={myGroups?.data?.groups} groupId={groupId} />
       </Drawer>
     </Grid>
   );
 }
 const GroupList = ({ w = '100%', myGroups = [], chatId }) => {
   return <>
-    <Stack width={w} bgcolor={"#424242"}  height={"100vh"} overflow={'auto'}>
+    <Stack width={w} bgcolor={"#424242"} height={"100vh"} overflow={'auto'}>
       {
         myGroups.length > 0 ? myGroups.map((group) => <GroupListItem group={group} groupId={chatId} key={group._id} />) : <Typography textAlign='center' padding='1rem'>No Groups</Typography>
       }
@@ -194,7 +210,7 @@ const GroupListItem = memo(({ group, groupId }) => {
   const { name, avatar, _id } = group
   return <Link to={`?group=${_id}`} onClick={(e) => {
     if (groupId === _id) e.preventDefault()
-  }} style={{margin:"1.5rem"}}>
+  }} style={{ margin: "1.5rem" }}>
     <Stack direction={'row'} spacing={'1rem'} alignItems={'center'}>
       <AvatarCard avatar={avatar} />
       <Typography>{name}</Typography>

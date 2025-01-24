@@ -65,6 +65,7 @@ function Chat({ chatId, user }) {
       chat: chatId,
       createdAt: new Date().toISOString()
     }
+    if (data.chatId !== chatId) return;
     setMessages((prev)=>[...prev,messageForAlert])
   }, [chatId])
 
