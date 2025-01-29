@@ -134,8 +134,26 @@ const api = createApi({
                 body:{groupname}
             }),
             invalidatesTags:["Chat"]
+        }),
+        addGroupMembers:builder.mutation({
+            query:({groupId, members})=>({
+                url:'/chat/addMembers',
+                method:"PUT",
+                credentials:"include",
+                body:{groupId, members}
+            }),
+            invalidatesTags:["Chat"]
+        }),
+        removeGroupMembers:builder.mutation({
+            query:({userId,groupId})=>({
+                url:'/chat/removeMember',
+                method:"DELETE",
+                credentials:"include",
+                body:{userId,groupId}
+            }),
+            invalidatesTags:["Chat"]
         })
     })
 })
 export default api;
-export const { useMyChatsQuery, useLazySearchUserQuery, useSendFriendRequestMutation, useGetNotificationQuery, useAcceptFriendRequestMutation, useOneToOneQuery, useChatDetailsQuery, useGetOldMessagesQuery, useSendAttachmentsMutation, useMyGroupsQuery,useAvaliableFriendsQuery,useNewGroupMutation,useRenameGroupMutation } = api
+export const { useMyChatsQuery, useLazySearchUserQuery, useSendFriendRequestMutation, useGetNotificationQuery, useAcceptFriendRequestMutation, useOneToOneQuery, useChatDetailsQuery, useGetOldMessagesQuery, useSendAttachmentsMutation, useMyGroupsQuery,useAvaliableFriendsQuery,useNewGroupMutation,useRenameGroupMutation,useRemoveGroupMembersMutation,useAddGroupMembersMutation } = api

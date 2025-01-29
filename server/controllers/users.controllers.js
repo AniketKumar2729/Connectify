@@ -147,7 +147,7 @@ export const getMyNotificatoins = TryCatch(async (req, res, next) => {
 })
 
 export const getMyFriends = TryCatch(async (req, res, next) => {
-    const chatId = req.query.ChatId
+    const chatId = req.query.chatId
     const chats = await Chat.find({ members: req.userId, groupChat: false }).populate("members", "name avatar")
     const friends = chats.map(({ members }) => {
         const otherUser = getOtherMember(members, req.userId)
@@ -159,15 +159,15 @@ export const getMyFriends = TryCatch(async (req, res, next) => {
     })
     if (chatId) {
         const chat = await Chat.findById(chatId)
-        const availableFriends = friends.filter((friend) => !chat.members.include(friend._id))
+        const availableFriends = friends.filter((friend) => !chat?.members?.includes(friend._id))
         return res.status(200).json({
             success: true,
-            friends: availableFriends
+            "availableFriends": availableFriends
         })
     } else {
         return res.status(200).json({
             success: true,
-            friends
+            "Friends": friends
         })
     }
 
