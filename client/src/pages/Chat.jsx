@@ -1,21 +1,21 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useDispatch } from "react-redux";
+import { useInfiniteScrollTop } from "6pp";
 import AttachmentIcon from '@mui/icons-material/Attachment';
 import SendIcon from '@mui/icons-material/Send';
 import { IconButton, Skeleton, Stack } from '@mui/material';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useDispatch } from "react-redux";
 import FileMenu from '../components/dialogs/FileMenu';
 import AppLayout from '../components/layout/AppLayout';
+import { TypingLoader } from '../components/layout/Loaders.jsx';
 import MessageComponent from '../components/shared/MessageComponent';
 import { InputBox } from '../components/styles/StyledComponent';
 import { gray } from '../constants/color';
 import { ALERT, NEW_MESSAGE, START_TYPING, STOP_TYPING } from "../constants/event.constants.js";
-import { useChatDetailsQuery, useGetOldMessagesQuery } from '../redux/api/api.js';
-import { getSocket } from '../Socket';
 import { useErrors, useSocketEvent } from '../hooks/hook.jsx';
-import { useInfiniteScrollTop } from "6pp"
-import { setIsFileMenu } from '../redux/reducers/miscellaneous.reducers.js';
+import { useChatDetailsQuery, useGetOldMessagesQuery } from '../redux/api/api.js';
 import { removeNewMessagesAlert } from '../redux/reducers/chat.reducer.js';
-import { TypingLoader } from '../components/layout/Loaders.jsx';
+import { setIsFileMenu } from '../redux/reducers/miscellaneous.reducers.js';
+import { getSocket } from '../Socket';
 function Chat({ chatId, user }) {
   const dispatch = useDispatch()
   //message is used for storing whatever user have written
@@ -66,7 +66,7 @@ function Chat({ chatId, user }) {
       createdAt: new Date().toISOString()
     }
     if (data.chatId !== chatId) return;
-    setMessages((prev)=>[...prev,messageForAlert])
+    setMessages((prev) => [...prev, messageForAlert])
   }, [chatId])
 
   const eventHandler = { [NEW_MESSAGE]: newMessageListener, [START_TYPING]: startTypingListener, [STOP_TYPING]: stopTypingListener, [ALERT]: alertListener }

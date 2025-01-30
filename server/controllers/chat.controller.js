@@ -1,9 +1,9 @@
 import { ALERT, NEW_ATTACHMENTS, NEW_MESSAGE_ALERT, REFETCH_CHATS } from "../constants/event.constants.js";
 import { getOtherMember } from "../lib/helper.lib.js";
-import { errorHandler, TryCatch } from "../middlewares/errorHandler.middleware.js"
+import { errorHandler, TryCatch } from "../middlewares/errorHandler.middleware.js";
 import { Chat } from "../models/chat.model.js";
-import { User } from "../models/user.model.js";
 import { Message } from "../models/message.model.js";
+import { User } from "../models/user.model.js";
 import { deleteFilesFromCloudinary, emitEvent, uploadFileIntoCloudinary } from "../utils/features.utils.js";
 
 const newGroupChat = TryCatch(async (req, res, next) => {
@@ -42,47 +42,6 @@ const getMyChats = TryCatch(async (req, res, next) => {
     return res.status(200).json({
         success: true,
         chats: transFormedChats
-    })
-})
-const oneToOneChat = TryCatch(async (req, res, next) => {
-    const chats = await Chat.find({
-        $and: [
-            { members: { $size: 2 } },
-            { members: req.userId }
-        ]
-    }).populate("members", "name avatar");
-    let tranformedMember = {
-        sender: {
-            avatar: '',
-            name: '',
-            id:''
-        },
-        receiver: {
-            avatar: '',
-            name: '',
-            id:''
-        }
-    }
-    chats[0].members.map((chat, idx) => {
-        if (chat._id.toString() === req.userId.toString()) {
-            tranformedMember.sender = {
-                avatar: chat.avatar.url,
-                name: chat.name,
-                id:chat._id
-            }
-        } else {
-            tranformedMember.receiver = {
-                avatar: chat.avatar.url,
-                name: chat.name,
-                id:chat._id
-            }
-        }
-    })
-
-    return res.status(200).json({
-        success: true,
-        message: 'api working well',
-        tranformedMember
     })
 })
 
@@ -139,10 +98,11 @@ const removeMembers = TryCatch(async (req, res, next) => {
         return next(errorHandler(403, 'You are not allowed to remove members'))
     if (group.members.length <= 3)
         return next(errorHandler(400, "Group must have atleast 3 members"))
+    const allMembersOfGroup = group.members.map((i) => i.toString())
     group.members = group.members.filter((membersId) => membersId.toString() !== userId.toString())
     await group.save()
     emitEvent(req, ALERT, group.members, `${userRemoved.name} has been removed from the group`)
-    emitEvent(req, REFETCH_CHATS, group.members)
+    emitEvent(req, REFETCH_CHATS, allMembersOfGroup)
     return res.status(200).json({
         success: true,
         message: "Member removed successfully"
@@ -200,8 +160,10 @@ const sendAttachments = TryCatch(async (req, res, next) => {
 )
 //const chatDetails=TryCatch()
 const getGroupDetails = TryCatch(async (req, res, next) => {
+    const chatId = req.params.id
+    // console.log(req.userId)
     if (req.query.populate === "true") {
-        const group = await Chat.findById(req.params.id).populate("members", "name avatar").lean()
+        const group = await Chat.findById(chatId).populate("members", "name avatar").lean()
         if (!group)
             return next(errorHandler(404, "Group not found"));
         group.members = group.members.map(({ _id, name, avatar }) => ({
@@ -214,7 +176,10 @@ const getGroupDetails = TryCatch(async (req, res, next) => {
             group
         })
     } else {
-        const group = await Chat.findById(req.params.id)
+        const group = await Chat.findById(chatId)
+        if(!group.members.includes(req.userId)){
+            return next(errorHandler(403,"You are not Allowed"))
+        }
         if (!group)
             return next(errorHandler(404, "Group not found"));
         return res.status(200).json({
@@ -277,10 +242,13 @@ const getMessages = TryCatch(async (req, res, next) => {
     const { page = 1 } = req.query
     const resultPerPage = 20
     const skip = (page - 1) * resultPerPage
+    const chat = await Chat.findById(chatId)
+    if (!chat) return next(errorHandler(404, "Chat Not Found"))
+    if (!chat.members.includes(req.userId.toString())) return next(errorHandler(403, "You are not allow to access this chat"))
     const [messages, totalMessagesCount] = await Promise.all([Message.find({ chat: chatId }).sort({ createdAt: -1 }).skip(skip).limit(resultPerPage).populate("sender", "name").lean(), Message.countDocuments({ chat: chatId })])
     const totalPage = Math.ceil(totalMessagesCount / resultPerPage)
     return res.status(200).json({ success: true, messages: messages, totalPage: totalPage })
 
 
 })
-export { newGroupChat, getMyChats, getMyGroups, addMembers, removeMembers, leaveGroup, sendAttachments, getGroupDetails, renameGroup, deleteChat, getMessages, oneToOneChat }
+export { addMembers, deleteChat, getGroupDetails, getMessages, getMyChats, getMyGroups, leaveGroup, newGroupChat, removeMembers, renameGroup, sendAttachments };

@@ -56,7 +56,7 @@ const NewGroup = () => {
         <TextField value={groupName.value} onChange={groupName.changeHandler} label="Group Name" />
         <Typography variant="body1">Members</Typography>
         <Stack>
-          {isLoading ? <Skeleton /> : data?.friends?.map((user) => (
+          {isLoading ? <Skeleton /> : data?.Friends?.map((user) => (
             <UserItem
               user={user}
               key={user._id}

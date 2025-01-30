@@ -4,7 +4,7 @@ import DoneAllIcon from '@mui/icons-material/DoneAll';
 import EditIcon from '@mui/icons-material/Edit';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import MenuIcon from '@mui/icons-material/Menu';
-import { Backdrop, Box, Button, Drawer, Grid, IconButton, Stack, TextField, Tooltip, Typography } from '@mui/material'; // Standard Grid from MUI
+import { Backdrop, Box, Button, CircularProgress, Drawer, Grid, IconButton, Stack, TextField, Tooltip, Typography } from '@mui/material'; // Standard Grid from MUI
 import React, { lazy, memo, Suspense, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -13,7 +13,7 @@ import AvatarCard from '../components/shared/AvatarCard';
 import UserItem from '../components/shared/UserItem.jsx';
 import { Link } from '../components/styles/StyledComponent';
 import { useAsyncMutation, useErrors } from '../hooks/hook.jsx';
-import { useChatDetailsQuery, useMyGroupsQuery, useRemoveGroupMembersMutation, useRenameGroupMutation } from '../redux/api/api.js';
+import { useChatDetailsQuery, useDeleteChatMutation, useMyGroupsQuery, useRemoveGroupMembersMutation, useRenameGroupMutation } from '../redux/api/api.js';
 import { setIsAddMember } from '../redux/reducers/miscellaneous.reducers.js';
 //lazzy load
 const DeleteDialog = lazy(() => import("../components/dialogs/DeleteDialog.jsx"))
@@ -28,6 +28,7 @@ const {isAddMember}=useSelector(state=>state.misc)
   const groupDetails = useChatDetailsQuery({ chatId: groupId, populate: true }, { skip: !groupId })
   const [updateGroup, isLoadingGroupName] = useAsyncMutation(useRenameGroupMutation)
   const [removeMember, isLoadingRemoveMember] = useAsyncMutation(useRemoveGroupMembersMutation)
+  const [deleteGroup, isLoadingDeleteGroup] = useAsyncMutation(useDeleteChatMutation)
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
@@ -76,6 +77,8 @@ const {isAddMember}=useSelector(state=>state.misc)
   }
   const dltHandler = () => {
     console.log('delete handler for delete dialog box');
+    deleteGroup("Deleting Group...",{chatId:groupId})
+    navigate("/")
     closeDialog();
 
   }
@@ -182,7 +185,7 @@ const {isAddMember}=useSelector(state=>state.misc)
           <Stack maxWidth={'45rem'} width={'100%'} boxSizing={'border-box'} padding={{ sm: '1rem', xs: '0', md: '1rem 4rem' }} spacing={'2rem'} height={'50vh'} overflow={'auto'}>
             {/** members*/}
             {
-              groupMembers?.map((i) => (
+              isLoadingRemoveMember ?<CircularProgress/>:groupMembers?.map((i) => (
                 <UserItem user={i} key={i._id} isAdded styling={{ boxShadow: '0 0 0.5rem rgba(0,0,0,0.2)', padding: '1rem', borderRadius: '2rem' }} handler={removeMemberHandler} />
               ))
             }
