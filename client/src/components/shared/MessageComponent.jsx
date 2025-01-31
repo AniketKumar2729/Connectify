@@ -4,13 +4,13 @@ import React, { memo } from 'react'
 import { fileFormat } from '../../lib/features'
 import RenderAttachments from './RenderAttachments'
 // import { fileFormat } from '../../lib/features.js'
-
+import {motion} from 'framer-motion'
 const MessageComponent = ({message,user}) => {
     const{sender,content,attachments=[],createdAt}=message    
     const sameSender=sender?._id===user?._id
     const timeAgo=moment(createdAt).fromNow()
   return (
-    <div style={{alignSelf:sameSender?'flex-end':'flex-start',background:sameSender?'#E88D67':'#006989',color:sameSender?'white':'black',borderRadius:'.5rem',padding:'.5rem',width:'fit-content'}}>
+    <motion.div initial={{opacity:0,x:"-100%"}} whileInView={{opacity:1,x:0}} style={{alignSelf:sameSender?'flex-end':'flex-start',background:sameSender?'#E88D67':'#006989',color:sameSender?'white':'black',borderRadius:'.5rem',padding:'.5rem',width:'fit-content'}}>
     {
         !sameSender&&<Typography color={'#FFFBE6'} fontWeight={'600'} variant={'caption'}>{sender?.name}</Typography>
     }
@@ -31,7 +31,7 @@ const MessageComponent = ({message,user}) => {
     )
    }
     <Typography variant={'caption'}>{timeAgo}</Typography>
-    </div>
+    </motion.div>
   )
 }
 
