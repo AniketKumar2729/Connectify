@@ -161,7 +161,15 @@ const api = createApi({
             }),
             invalidatesTags:["Chat"]
         }),
-    })
+        leaveGroup:builder.mutation({
+            query:(chatId)=>({
+                url:`/chat/leave/${chatId}`,
+                method:"DELETE",
+                credentials:"include"
+            }),
+            invalidatesTags:['Chat']
+        })
+    }),
 })
 export default api;
-export const { useMyChatsQuery, useLazySearchUserQuery, useSendFriendRequestMutation, useGetNotificationQuery, useAcceptFriendRequestMutation, useOneToOneQuery, useChatDetailsQuery, useGetOldMessagesQuery, useSendAttachmentsMutation, useMyGroupsQuery,useAvaliableFriendsQuery,useNewGroupMutation,useRenameGroupMutation,useRemoveGroupMembersMutation,useAddGroupMembersMutation,useDeleteChatMutation } = api
+export const { useMyChatsQuery, useLazySearchUserQuery, useSendFriendRequestMutation, useGetNotificationQuery, useAcceptFriendRequestMutation, useOneToOneQuery, useChatDetailsQuery, useGetOldMessagesQuery, useSendAttachmentsMutation, useMyGroupsQuery,useAvaliableFriendsQuery,useNewGroupMutation,useRenameGroupMutation,useRemoveGroupMembersMutation,useAddGroupMembersMutation,useDeleteChatMutation,useLeaveGroupMutation } = api
